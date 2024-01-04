@@ -16,7 +16,7 @@ export async function GET(): Promise<NextResponse<App[]>> {
                           outbound_hosts,
                           read_topics,
                           write_topics
-                   FROM \` aura-prod-d7e3.dataproduct_apps.dataproduct_apps_unique_v3\`
+                   FROM \`aura-prod-d7e3.dataproduct_apps.dataproduct_apps_unique_v3\`
                    WHERE dato = (SELECT MAX(dato) FROM \`aura-prod-d7e3.dataproduct_apps.dataproduct_apps_unique_v3\`)`
 
     // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
