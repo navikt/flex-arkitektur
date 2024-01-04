@@ -45,3 +45,5 @@ spec:
     - emptyDir:
         medium: Memory
       mountPath: /.next/cache
+  gcp:
+    bigQueryDatasets:
