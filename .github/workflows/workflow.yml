@@ -1,60 +1,15 @@
-name: Push
+name: workflow
 on:
   workflow_dispatch:
   push:
 
 jobs:
-  build-and-publish:
-    name: Bygg, test og push Docker image
-    runs-on: ubuntu-latest
+  felles-workflow:
+    uses: navikt/flex-github-actions-workflows/.github/workflows/next-js-lightweight.yml@main
     permissions:
       packages: read
       contents: read
       id-token: write
-    outputs:
-      image: ${{ steps.docker-build-push.outputs.image }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - name: Install npm dependencies
-        run: npm ci
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run prettier
-        run: npm run prettier:check
-      - name: Run lint
-        run: npm run lint
-      - run: ./hent-repoer.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.READER_TOKEN }}
-      - name: Build application
-        run: npm run build
-      - name: docker-build-push
-        if: github.ref_name == 'main' || startsWith(github.ref_name, 'dev-')
-        uses: nais/docker-build-push@v0
-        id: docker-build-push
-        with:
-          team: flex
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-
-  nais-deploy:
-    if: github.ref_name == 'main' || startsWith(github.ref_name, 'dev-')
-    needs: build-and-publish
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-    concurrency: nais-deploy
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - uses: nais/deploy/actions/deploy@v2
-        name: Deploy til dev
-        env:
-          CLUSTER: dev-gcp
-          IMAGE: ${{ needs.build-and-publish.outputs.image }}
-          RESOURCE: nais/app/naiserator.yaml
+      security-events: write
+      actions: read
+    secrets: inherit

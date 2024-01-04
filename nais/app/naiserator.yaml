@@ -1,18 +1,15 @@
 apiVersion: 'nais.io/v1alpha1'
 kind: 'Application'
 metadata:
-  name: flex-trello-docs
+  name: flex-arkitektur
   namespace: flex
-  annotations:
-    snorlax.nais.io/enabled: 'false'
   labels:
     team: flex
 spec:
   image: {{image}}
   port: 8080
   ingresses:
-    - https://flex-docs.intern.dev.nav.no
-    - https://flex-docs.ekstern.dev.nav.no
+    - {{ingress}}
   replicas:
     min: 2
     max: 3
@@ -25,17 +22,12 @@ spec:
       port: 8080
   azure:
     application:
-      allowAllUsers: false
+      allowAllUsers: true
       enabled: true
       tenant: nav.no
-      claims:
-        groups:
-          - id: '84169515-62b4-4b6f-b07c-952cbb3f20b6' #flex-infoskjerm
-          - id: '7d275d5e-59a5-473d-b530-a9091b3de4c6'
     sidecar:
       enabled: true
       autoLogin: false
-
   resources:
     limits:
       memory: 350Mi
@@ -49,29 +41,6 @@ spec:
   startup:
     path: /api/internal/isAlive
     initialDelay: 10
-  accessPolicy:
-    outbound:
-      external: # bruk nslookup mot api.trello.com og raw.githubusercontent.com og legg inn de nye ipene her
-        - ipv4: 185.166.143.18
-        - ipv4: 185.166.143.19
-        - ipv4: 185.166.143.20
-        - ipv4: 185.166.143.21
-        - ipv4: 185.166.143.22
-        - ipv4: 185.166.143.23
-        - ipv4: 185.166.143.24
-        - ipv4: 185.166.143.25
-        - ipv4: 185.166.143.26
-        - ipv4: 185.199.108.133
-        - ipv4: 185.199.109.133
-        - ipv4: 185.199.110.133
-        - ipv4: 185.199.111.133
-  envFrom:
-    - secret: flex-trello-docs-trello-secrets
-  env:
-    - name: TRELLO_OKR_BOARD
-      value: 0gO6UCsS
-    - name: TRELLO_RETRO_BOARD
-      value: Tx2MZJyC
   filesFrom:
     - emptyDir:
         medium: Memory
