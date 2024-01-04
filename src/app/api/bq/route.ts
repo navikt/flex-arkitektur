@@ -11,7 +11,7 @@ export async function GET(req: Request): Promise<NextResponse<Record<string, str
         const bigquery = new BigQuery()
 
         const query = `SELECT feedback_id, svar
-                       FROM \` flex-prod-af40.flex_dataset.flexjar_feedback_spinnsyn_view\`
+                       FROM \`flex-prod-af40.flex_dataset.flexjar_feedback_spinnsyn_view\`
                        LIMIT 20`
 
         // For all options, see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query
