@@ -47,3 +47,5 @@ spec:
       mountPath: /.next/cache
   gcp:
     bigQueryDatasets:
+      - name: flex-arkitektur_dataset
+        permission: READWRITE
