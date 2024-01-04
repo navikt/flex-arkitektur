@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { BigQuery } from '@google-cloud/bigquery'
 import { logger } from '@navikt/next-logger'
@@ -28,9 +29,9 @@ export async function GET(req: Request): Promise<NextResponse<Record<string, str
         logger.info('bq api request' + JSON.stringify(rows))
         // Print the results
 
-        return NextResponse.json({ res: JSON.stringify(rows) })
+        return NextResponse.json({ res: JSON.stringify(rows), ok: 'true' })
     } catch (error) {
         logger.error('bq api request' + error)
-        return NextResponse.json({ res: JSON.stringify(error) })
+        return NextResponse.json({ res: JSON.stringify(error), error: 'true' })
     }
 }
