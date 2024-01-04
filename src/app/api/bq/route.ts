@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { BigQuery } from '@google-cloud/bigquery'
+import { logger } from '@navikt/next-logger'
 
-export async function GET(): Promise<NextResponse<Record<string, string>>> {
+export async function GET(req: Request): Promise<NextResponse<Record<string, string>>> {
+    const text = await req.text()
+    logger.info('bq api request' + text)
+
     const bigquery = new BigQuery()
 
     const query = `SELECT feedback_id, svar FROM \`flex-prod-af40.flex_dataset.flexjar_feedback_spinnsyn_view\`      LIMIT 20`
@@ -18,7 +22,7 @@ export async function GET(): Promise<NextResponse<Record<string, string>>> {
 
     // Wait for the query to finish
     const [rows] = await job.getQueryResults()
-
+    logger.info('bq api request' + JSON.stringify(rows))
     // Print the results
 
     return NextResponse.json({ res: JSON.stringify(rows) })
