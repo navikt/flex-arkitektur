@@ -1,5 +1,6 @@
 import { ReactElement, useEffect, useRef } from 'react'
 import { Network, Node, Edge } from 'vis-network'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
 
 import { NaisApp } from '@/types'
 
@@ -7,14 +8,24 @@ export function Graph({
     apper,
     namespaces,
     visKafka,
+    slettNoder,
 }: {
     apper: NaisApp[]
     namespaces: string[]
     visKafka: boolean
+    slettNoder: boolean
 }): ReactElement {
     const container = useRef(null)
+    const [slettedeNoder, setSlettedeNoder] = useQueryState(
+        'slettedeNoder',
+        parseAsArrayOf(parseAsString).withDefault([]),
+    )
 
-    const filtreteApper = apper.filter((app) => namespaces.includes(app.namespace))
+    const filtreteApper = apper
+        .filter((app) => namespaces.includes(app.namespace))
+        .filter((app) => {
+            return !slettedeNoder.includes(name(app))
+        })
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const data = {
         nodes: [] as Node[],
@@ -39,6 +50,7 @@ export function Graph({
     if (visKafka) {
         filtreteApper.forEach((app) => {
             function parseKafka(topic: string, write: boolean): void {
+                if (slettedeNoder.includes(topic)) return
                 if (!data.nodes.find((node) => node.id === topic)) {
                     const namespace = topic.split('.')[1]
                     const topicNavn = topic.split('.')[2]
@@ -60,6 +72,7 @@ export function Graph({
                     arrows: { to: { enabled: !write }, from: { enabled: write } },
                 })
             }
+
             app.read_topics?.forEach((t) => {
                 parseKafka(t, false)
             })
@@ -104,11 +117,10 @@ export function Graph({
                 },
             })
             network.on('click', function (params) {
-                // eslint-disable-next-line
-                console.log(params)
+                if (slettNoder) setSlettedeNoder((slettedeNoder) => [...slettedeNoder, params.nodes[0]])
             })
         }
-    }, [container, data])
+    }, [container, data, setSlettedeNoder, slettNoder])
 
     return <div ref={container} style={{ height: 'calc(100vh - var(--a-spacing-32))' }} />
 }

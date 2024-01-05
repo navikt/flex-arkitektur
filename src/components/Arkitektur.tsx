@@ -1,5 +1,5 @@
 'use client'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
 import { Alert, Select, Switch, UNSAFE_Combobox } from '@navikt/ds-react'
@@ -11,6 +11,7 @@ import { Graph } from '@/components/Graph'
 export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
     const [visKafka, setVisKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
+    const [slettNoder, setSlettNoder] = useState(false)
 
     const [namespaces, setNamespaces] = useQueryState('namespace', parseAsArrayOf(parseAsString).withDefault(['flex']))
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
@@ -63,9 +64,14 @@ export const Arkitektur = (): ReactElement => {
                             Vis Kafka
                         </Switch>
                     </div>
+                    <div className="self-end">
+                        <Switch checked={slettNoder} onChange={() => setSlettNoder(!slettNoder)}>
+                            Slett noder med museklikk
+                        </Switch>
+                    </div>
                 </div>
             </div>
-            <Graph apper={data} namespaces={namespaces} visKafka={visKafka} />
+            <Graph apper={data} namespaces={namespaces} visKafka={visKafka} slettNoder={true} />
         </>
     )
 }
