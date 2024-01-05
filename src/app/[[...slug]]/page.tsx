@@ -1,13 +1,13 @@
 import { ReactElement } from 'react'
 
-import { Visualisering } from '@/components/Visualisering'
+import { Arkitektur } from '@/components/Arkitektur'
 import { QueryClientWrap } from '@/components/QueryClientWrap'
 
 export default async function Docs({}: { params: { slug?: string[] } }): Promise<ReactElement> {
     return (
         <main>
             <QueryClientWrap>
-                <Visualisering />
+                <Arkitektur />
             </QueryClientWrap>
         </main>
     )

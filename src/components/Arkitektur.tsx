@@ -6,8 +6,9 @@ import { Alert, Select, UNSAFE_Combobox } from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
+import { Graph } from '@/components/Graph'
 
-export const Visualisering = (): ReactElement => {
+export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
 
     const [namespaces, setNamespaces] = useQueryState('namespace', parseAsArrayOf(parseAsString).withDefault(['flex']))
@@ -56,13 +57,8 @@ export const Visualisering = (): ReactElement => {
                     <option value="dev">Development</option>
                 </Select>
             </div>
-            {data
-                .filter((app) => namespaces.includes(app.namespace))
-                .map((app) => (
-                    <div key={app.name}>
-                        <h2>{app.name}</h2>
-                    </div>
-                ))}
+
+            <Graph apper={data} namespaces={namespaces} />
         </>
     )
 }
