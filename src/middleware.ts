@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     if (requestHeaders.get('authorization') == null && !isLocalOrDemo) {
         const redirectUrl = request.nextUrl.clone()
         redirectUrl.pathname = `/oauth2/login`
-        redirectUrl.searchParams.set('redirect', requestUrl.pathname)
+        redirectUrl.searchParams.set('redirect', requestUrl.pathname + requestUrl.search)
 
         return NextResponse.redirect(redirectUrl)
     }
