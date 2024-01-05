@@ -50,7 +50,7 @@ export async function GET(req: Request): Promise<NextResponse<App[]>> {
         lastFetchTime = currentTime
     }
     const nextResponse = NextResponse.json(cachedData.filter((app) => app.cluster.includes(cluster)))
-    nextResponse.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600')
+    // nextResponse.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600')
 
     return nextResponse
 }
