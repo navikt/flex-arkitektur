@@ -58,7 +58,7 @@ export const Arkitektur = (): ReactElement => {
     }
 
     // unike namespaces fra data
-    const alleNamespaces = Array.from(new Set(data.map((app) => app.namespace)))
+    const alleNamespaces = Array.from(new Set(data.map((app) => app.namespace))).sort()
     const onToggleSelected = (option: string, isSelected: boolean): void => {
         if (isSelected) {
             setNamespaces([...namespaces, option])
