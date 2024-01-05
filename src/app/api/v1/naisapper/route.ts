@@ -13,7 +13,7 @@ export async function GET(req: Request): Promise<NextResponse<NaisApp[]>> {
     const currentTime = Date.now()
     const params = new URL(req.url).searchParams
     const cacheTimer = 6
-    const cluster = params.get('cluster') || 'prod'
+    const cluster = params.get('env') || 'prod'
 
     if (!cachedData || currentTime - lastFetchTime > 3600000 * cacheTimer) {
         logger.info('Henter naisapper fra bigquery')
