@@ -2,7 +2,7 @@
 import React, { ReactElement, useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
-import { Alert, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
+import { Alert, Button, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
@@ -15,6 +15,7 @@ export const Arkitektur = (): ReactElement => {
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [filterTekst, setFilterTekst] = useState(filter.join(' '))
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
+    const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
 
     const [hasTyped, setHasTyped] = useState(false)
 
@@ -83,7 +84,6 @@ export const Arkitektur = (): ReactElement => {
                     </Select>
                     <TextField
                         label="Filter"
-                        size="small"
                         value={filterTekst}
                         onChange={(e) => {
                             setFilterTekst(e.target.value)
@@ -104,6 +104,20 @@ export const Arkitektur = (): ReactElement => {
                         <Switch checked={slettNoder} onChange={() => setSlettNoder(!slettNoder)}>
                             Slett noder med museklikk
                         </Switch>
+                    </div>
+                    <div className="self-end">
+                        <Button
+                            onClick={() => {
+                                setFilter([])
+                                setFilterTekst('')
+                                setNamespaces(['flex'])
+                                setVisKafka(true)
+                                setSlettNoder(false)
+                                setSlettedeNoder([])
+                            }}
+                        >
+                            Reset
+                        </Button>
                     </div>
                 </div>
             </div>
