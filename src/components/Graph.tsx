@@ -1,5 +1,6 @@
 import { ReactElement, useEffect, useRef } from 'react'
 import { Network, Node, Edge } from 'vis-network'
+import { logger } from '@navikt/next-logger'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
 
 import { NaisApp } from '@/types'
@@ -10,23 +11,23 @@ export function Graph({
     visKafka,
     slettNoder,
     filter,
+    initielleSlettedeNoder,
 }: {
     apper: NaisApp[]
     namespaces: string[]
     visKafka: boolean
     slettNoder: boolean
     filter: string[]
+    initielleSlettedeNoder: string[]
 }): ReactElement {
     const container = useRef(null)
-    const [slettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
-
+    const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
     const forrigeNoder = useRef(new Set<string>())
     const forrigeEdges = useRef(new Set<string>())
     const filtreteApper = apper
         .filter((app) => namespaces.includes(app.namespace))
-        .filter(() => {
-            return true
-            //return !slettedeNoder.includes(name(app)) TODO fiks delbart
+        .filter((app) => {
+            return !initielleSlettedeNoder.includes(name(app))
         })
         .filter((app) => {
             if (filter.length === 0) {
@@ -59,7 +60,7 @@ export function Graph({
     if (visKafka) {
         filtreteApper.forEach((app) => {
             function parseKafka(topic: string, write: boolean): void {
-                if (slettedeNoder.includes(topic)) return
+                if (initielleSlettedeNoder.includes(topic)) return
                 if (!data.nodes.find((node) => node.id === topic)) {
                     const namespace = topic.split('.')[1]
                     const topicNavn = topic.split('.')[2]
@@ -100,9 +101,11 @@ export function Graph({
         if (container.current) {
             const nyeNoder = new Set(data.nodes.map((node) => node.id as string))
             const nyeKanter = new Set(data.edges.map((edge) => edge.id as string))
+
             if (areSetsEqual(nyeNoder, forrigeNoder.current) && areSetsEqual(nyeKanter, forrigeEdges.current)) {
                 return
             }
+            logger.info('Rerenderer graf')
             forrigeNoder.current = nyeNoder
             forrigeEdges.current = nyeKanter
 
@@ -134,20 +137,15 @@ export function Graph({
             })
             network.on('click', function (params) {
                 if (slettNoder) {
-                    // TODO fiks delbart setSlettedeNoder((slettedeNoder) => [...slettedeNoder, params.nodes[0]])
+                    setSlettedeNoder((slettedeNoder) => [...slettedeNoder, params.nodes[0]])
                     network.selectNodes(params.nodes)
                     network.deleteSelected()
                 }
             })
         }
-    }, [data, slettNoder])
+    }, [data, slettNoder, setSlettedeNoder])
 
-    return (
-        <>
-            {JSON.stringify(filter)}
-            <div ref={container} style={{ height: 'calc(100vh - var(--a-spacing-32))' }} />
-        </>
-    )
+    return <div ref={container} style={{ height: 'calc(100vh - var(--a-spacing-32))' }} />
 }
 
 function name(app: NaisApp): string {

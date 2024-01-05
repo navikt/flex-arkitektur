@@ -1,5 +1,5 @@
 'use client'
-import React, { ReactElement, useEffect, useState } from 'react'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
 import { Alert, Button, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
@@ -15,7 +15,12 @@ export const Arkitektur = (): ReactElement => {
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [filterTekst, setFilterTekst] = useState(filter.join(' '))
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
-    const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
+    const [slettedeNoder, setSlettedeNoder] = useQueryState(
+        'slettedeNoder',
+        parseAsArrayOf(parseAsString).withDefault([]),
+    )
+
+    const initielleSlettedeNoder = useRef(slettedeNoder)
 
     const [hasTyped, setHasTyped] = useState(false)
 
@@ -122,7 +127,14 @@ export const Arkitektur = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <Graph apper={data} namespaces={namespaces} visKafka={visKafka} slettNoder={slettNoder} filter={filter} />
+            <Graph
+                apper={data}
+                namespaces={namespaces}
+                visKafka={visKafka}
+                slettNoder={slettNoder}
+                filter={filter}
+                initielleSlettedeNoder={initielleSlettedeNoder.current}
+            />
         </>
     )
 }
