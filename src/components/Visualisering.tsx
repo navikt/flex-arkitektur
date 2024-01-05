@@ -37,24 +37,27 @@ export const Visualisering = (): ReactElement => {
     }
     return (
         <>
-            <UNSAFE_Combobox
-                label="Velg namespace"
-                options={alleNamespaces}
-                isMultiSelect
-                selectedOptions={namespaces}
-                onToggleSelected={onToggleSelected}
-            />
-            <Select
-                label="Miljø"
-                description="Velg det landet du tilbringer mest tid."
-                value={env}
-                onChange={(e) => {
-                    setEnv(e.target.value)
-                }}
-            >
-                <option value="prod">Produksjon</option>
-                <option value="dev">Development</option>
-            </Select>
+            <div className="flex gap-2">
+                <UNSAFE_Combobox
+                    label="Velg namespace"
+                    description="Du kan velge flere"
+                    options={alleNamespaces}
+                    isMultiSelect
+                    selectedOptions={namespaces}
+                    onToggleSelected={onToggleSelected}
+                />
+                <Select
+                    label="Miljø"
+                    description="Velg det landet du tilbringer mest tid."
+                    value={env}
+                    onChange={(e) => {
+                        setEnv(e.target.value)
+                    }}
+                >
+                    <option value="prod">Produksjon</option>
+                    <option value="dev">Development</option>
+                </Select>
+            </div>
             {data
                 .filter((app) => namespaces.includes(app.namespace))
                 .map((app) => (
