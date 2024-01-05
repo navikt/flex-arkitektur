@@ -1,8 +1,8 @@
 'use client'
 import React, { ReactElement } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
-import { Alert, Select, UNSAFE_Combobox } from '@navikt/ds-react'
+import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
+import { Alert, Select, Switch, UNSAFE_Combobox } from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
@@ -10,6 +10,7 @@ import { Graph } from '@/components/Graph'
 
 export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
+    const [visKafka, setVisKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
 
     const [namespaces, setNamespaces] = useQueryState('namespace', parseAsArrayOf(parseAsString).withDefault(['flex']))
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
@@ -55,11 +56,16 @@ export const Arkitektur = (): ReactElement => {
                         }}
                     >
                         <option value="prod">Produksjon</option>
-                        <option value="dev">Development</option>
+                        <option value="dev">Utvikling</option>
                     </Select>
+                    <div className="self-end">
+                        <Switch checked={visKafka} onChange={() => setVisKafka(!visKafka)}>
+                            Vis Kafka
+                        </Switch>
+                    </div>
                 </div>
             </div>
-            <Graph apper={data} namespaces={namespaces} />
+            <Graph apper={data} namespaces={namespaces} visKafka={visKafka} />
         </>
     )
 }
