@@ -24,7 +24,7 @@ export default async function RootLayout({
             <body>
                 <div className="min-h-screen bg-gray-50 flex">
                     <div className="overflow-y-auto w-full">
-                        <div className="flex-1 max-w-5xl mx-auto p-10 h-screen">
+                        <div className="flex-1 mx-auto p-10 h-screen">
                             <main>{children}</main>
                         </div>
                     </div>

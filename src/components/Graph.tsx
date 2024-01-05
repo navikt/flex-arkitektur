@@ -22,7 +22,7 @@ export function Graph({ apper, namespaces }: { apper: NaisApp[]; namespaces: str
         container.current && new Network(container.current, { nodes, edges }, {})
     }, [container, nodes, edges])
 
-    return <div ref={container} style={{ height: '500px', width: '800px' }} />
+    return <div ref={container} style={{ height: '800px', width: '1400px' }} />
 }
 
 function name(app: NaisApp): string {
