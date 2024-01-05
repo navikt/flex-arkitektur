@@ -24,6 +24,7 @@ export function Graph({
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
     const forrigeNoder = useRef(new Set<string>())
     const forrigeEdges = useRef(new Set<string>())
+    const networkRef = useRef<Network>()
     const filtreteApper = apper
         .filter((app) => namespaces.includes(app.namespace))
         .filter((app) => {
@@ -135,16 +136,29 @@ export function Graph({
                     solver: 'forceAtlas2Based',
                 },
             })
-            network.on('click', function (params) {
-                if (slettNoder) {
-                    setSlettedeNoder((slettedeNoder) => [...slettedeNoder, params.nodes[0]])
-                    network.selectNodes(params.nodes)
-                    network.deleteSelected()
-                }
-            })
+            networkRef.current = network
         }
-    }, [data, slettNoder, setSlettedeNoder])
+    }, [data])
 
+    useEffect(() => {
+        if (networkRef.current) {
+            if (slettNoder) {
+                networkRef.current.on('click', function (params) {
+                    if (params.nodes.length == 0) return
+                    try {
+                        setSlettedeNoder((slettedeNoder) => [...slettedeNoder, params.nodes[0]])
+                        networkRef.current?.selectNodes(params.nodes)
+                        networkRef.current?.deleteSelected()
+                        networkRef.current?.selectNodes([])
+                    } catch (e) {
+                        //TODO noe skjer, men det funker logger.error(e)
+                    }
+                })
+            } else {
+                networkRef.current.off('click')
+            }
+        }
+    }, [slettNoder, setSlettedeNoder])
     return <div ref={container} style={{ height: 'calc(100vh - var(--a-spacing-32))' }} />
 }
 
