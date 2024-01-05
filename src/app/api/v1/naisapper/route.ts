@@ -19,10 +19,11 @@ export async function GET(req: Request): Promise<NextResponse<NaisApp[]>> {
         logger.info('Henter naisapper fra bigquery')
         cachedData = await hentNaisApper()
         lastFetchTime = currentTime
+    } else {
+        logger.info('Henter naisapper fra cache')
     }
     const nextResponse = NextResponse.json(cachedData.filter((app) => app.cluster.includes(cluster)))
-    // TODO øk fra 10 sekunder når ting er stabilt
-    nextResponse.headers.set('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=10')
+    nextResponse.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=300')
 
     return nextResponse
 }
