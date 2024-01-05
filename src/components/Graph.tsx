@@ -38,14 +38,14 @@ export function Graph({
 
     if (visKafka) {
         filtreteApper.forEach((app) => {
-            app.read_topics?.forEach((readTopic) => {
-                if (!data.nodes.find((node) => node.id === readTopic)) {
-                    const namespace = readTopic.split('.')[1]
-                    const topicNavn = readTopic.split('.')[2]
+            function parseKafka(topic: string, write: boolean): void {
+                if (!data.nodes.find((node) => node.id === topic)) {
+                    const namespace = topic.split('.')[1]
+                    const topicNavn = topic.split('.')[2]
                     data.nodes.push({
-                        id: readTopic,
+                        id: topic,
                         label: namespaceToEmoji(namespace) + ' ' + topicNavn,
-                        shape: 'box',
+                        shape: 'ellipse',
                         group: namespace,
                         font: {
                             face: 'monospace',
@@ -53,6 +53,18 @@ export function Graph({
                         },
                     })
                 }
+                // TODO håndtere readwrite topics
+                data.edges.push({
+                    from: topic,
+                    to: name(app),
+                    arrows: { to: { enabled: !write }, from: { enabled: write } },
+                })
+            }
+            app.read_topics?.forEach((t) => {
+                parseKafka(t, false)
+            })
+            app.write_topics?.forEach((t) => {
+                parseKafka(t, true)
             })
         })
     }
