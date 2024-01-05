@@ -1,9 +1,10 @@
 import { ReactElement, useEffect, useRef } from 'react'
-import { Network, Node, Edge } from 'vis-network'
+import { Network, Node, Edge, Options } from 'vis-network'
 import { logger } from '@navikt/next-logger'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
 
 import { NaisApp } from '@/types'
+import { namespaceToColor } from '@/components/farger'
 
 export function Graph({
     apper,
@@ -110,32 +111,33 @@ export function Graph({
             forrigeNoder.current = nyeNoder
             forrigeEdges.current = nyeKanter
 
-            const network = new Network(container.current, data, {
+            const grupper = new Set<string>()
+            data.nodes.forEach((node) => {
+                if (node.group === undefined) return
+                grupper.add(node.group)
+            })
+
+            const options: Options = {
                 groups: {
                     noAuthConnection: {
                         color: { color: '#ff5a5a', highlight: '#ff5a5a', hover: '#ff5a5a' },
-                    },
-                    teamsykmelding: {
-                        font: {
-                            face: 'monospace',
-                            align: 'left',
-                            color: '#ffffff',
-                        },
-                        color: { background: 'green' },
-                    },
-                    flex: {
-                        font: {
-                            face: 'monospace',
-                            align: 'left',
-                            color: '#ffffff',
-                        },
-                        color: { background: 'blue' },
                     },
                 },
                 physics: {
                     solver: 'forceAtlas2Based',
                 },
+            }
+            Array.from(grupper).forEach((gruppe) => {
+                options.groups[gruppe] = {
+                    font: {
+                        face: 'monospace',
+                        align: 'left',
+                        color: '#ffffff',
+                    },
+                    color: { background: namespaceToColor(gruppe) },
+                }
             })
+            const network = new Network(container.current, data, options)
             networkRef.current = network
         }
     }, [data])

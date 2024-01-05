@@ -7,6 +7,7 @@ import { Alert, Button, Select, Switch, TextField, UNSAFE_Combobox } from '@navi
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
 import { Graph } from '@/components/Graph'
+import { namespaceToColor } from '@/components/farger'
 
 export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
@@ -23,7 +24,7 @@ export const Arkitektur = (): ReactElement => {
     const initielleSlettedeNoder = useRef(slettedeNoder)
 
     const [hasTyped, setHasTyped] = useState(false)
-
+    const comboboxRef = useRef<HTMLInputElement>(null)
     const [namespaces, setNamespaces] = useQueryState('namespace', parseAsArrayOf(parseAsString).withDefault(['flex']))
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
         queryKey: [`nais-apper`, env],
@@ -50,6 +51,15 @@ export const Arkitektur = (): ReactElement => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterTekst])
 
+    useEffect(() => {
+        const elements = comboboxRef.current?.parentElement?.parentElement?.getElementsByClassName('navds-chips__chip')
+        if (elements) {
+            Array.from(elements).forEach((element) => {
+                element.setAttribute('style', `background-color: ${namespaceToColor(element.textContent || '')};`)
+            })
+        }
+    }, [namespaces])
+
     if (!data || isFetching) {
         return <h2>Loading...</h2>
     }
@@ -71,6 +81,7 @@ export const Arkitektur = (): ReactElement => {
             <div className="h-32 p-10">
                 <div className="flex gap-3">
                     <UNSAFE_Combobox
+                        ref={comboboxRef}
                         label="Namespace"
                         options={alleNamespaces}
                         isMultiSelect
