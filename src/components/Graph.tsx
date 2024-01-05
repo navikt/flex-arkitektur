@@ -19,8 +19,7 @@ export function Graph({ apper, namespaces }: { apper: NaisApp[]; namespaces: str
     })
 
     useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const network = container.current && new Network(container.current, { nodes, edges }, {})
+        container.current && new Network(container.current, { nodes, edges }, {})
     }, [container, nodes, edges])
 
     return <div ref={container} style={{ height: '500px', width: '800px' }} />
