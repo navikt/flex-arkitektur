@@ -9,11 +9,13 @@ export function Graph({
     namespaces,
     visKafka,
     slettNoder,
+    filter,
 }: {
     apper: NaisApp[]
     namespaces: string[]
     visKafka: boolean
     slettNoder: boolean
+    filter: string[]
 }): ReactElement {
     const container = useRef(null)
     const [slettedeNoder, setSlettedeNoder] = useQueryState(
@@ -25,6 +27,12 @@ export function Graph({
         .filter((app) => namespaces.includes(app.namespace))
         .filter((app) => {
             return !slettedeNoder.includes(name(app))
+        })
+        .filter((app) => {
+            if (filter.length === 0) return true
+            return filter.some((f) => {
+                return name(app).includes(f)
+            })
         })
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const data = {

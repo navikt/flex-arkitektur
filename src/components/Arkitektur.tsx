@@ -1,8 +1,8 @@
 'use client'
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
-import { Alert, Select, Switch, UNSAFE_Combobox } from '@navikt/ds-react'
+import { Alert, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
@@ -12,6 +12,11 @@ export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
     const [visKafka, setVisKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
     const [slettNoder, setSlettNoder] = useState(false)
+    const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
+    const [filterTekst, setFilterTekst] = useState(filter.join(' '))
+    const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
+
+    const [hasTyped, setHasTyped] = useState(false)
 
     const [namespaces, setNamespaces] = useQueryState('namespace', parseAsArrayOf(parseAsString).withDefault(['flex']))
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
@@ -22,6 +27,23 @@ export const Arkitektur = (): ReactElement => {
             return await fetchJsonMedRequestId(url)
         },
     })
+    useEffect(() => {
+        // Avbryt eksisterende timeout
+        if (timeoutId) clearTimeout(timeoutId)
+        if (!hasTyped) return
+
+        // Opprett en ny timeout
+        const newTimeoutId = setTimeout(() => {
+            setFilter(filterTekst.split(' '))
+        }, 500)
+
+        setTimeoutId(newTimeoutId)
+
+        // Rengjøringsfunksjon
+        return () => clearTimeout(newTimeoutId)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterTekst])
+
     if (!data || isFetching) {
         return <h2>Loading...</h2>
     }
@@ -59,6 +81,20 @@ export const Arkitektur = (): ReactElement => {
                         <option value="prod">Produksjon</option>
                         <option value="dev">Utvikling</option>
                     </Select>
+                    <TextField
+                        label="Filter"
+                        size="small"
+                        value={filterTekst}
+                        onChange={(e) => {
+                            setFilterTekst(e.target.value)
+                            setHasTyped(true)
+                        }}
+                        onKeyUp={(e) => {
+                            if (e.key === 'Enter') {
+                                setFilter(filterTekst.split(' '))
+                            }
+                        }}
+                    />
                     <div className="self-end">
                         <Switch checked={visKafka} onChange={() => setVisKafka(!visKafka)}>
                             Vis Kafka
@@ -71,7 +107,7 @@ export const Arkitektur = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <Graph apper={data} namespaces={namespaces} visKafka={visKafka} slettNoder={true} />
+            <Graph apper={data} namespaces={namespaces} visKafka={visKafka} slettNoder={slettNoder} filter={filter} />
         </>
     )
 }
