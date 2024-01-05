@@ -64,7 +64,7 @@ export const Arkitektur = (): ReactElement => {
     return (
         <>
             <div className="h-32 p-10">
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                     <UNSAFE_Combobox
                         label="Namespace"
                         options={alleNamespaces}
@@ -107,6 +107,7 @@ export const Arkitektur = (): ReactElement => {
                     </div>
                     <div className="self-end">
                         <Button
+                            variant="secondary-neutral"
                             onClick={() => {
                                 setFilter([])
                                 setFilterTekst('')
