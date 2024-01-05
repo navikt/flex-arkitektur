@@ -135,7 +135,7 @@ export function Graph({
             network.on('click', function (params) {
                 if (slettNoder) {
                     // TODO fiks delbart setSlettedeNoder((slettedeNoder) => [...slettedeNoder, params.nodes[0]])
-                    network.selectNodes(params.nodes[0])
+                    network.selectNodes(params.nodes)
                     network.deleteSelected()
                 }
             })
