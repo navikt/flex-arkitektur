@@ -22,12 +22,8 @@ export default async function RootLayout({
                 <link rel="manifest" href="/site.webmanifest" />
             </head>
             <body>
-                <div className="min-h-screen bg-gray-50 flex">
-                    <div className="overflow-y-auto w-full">
-                        <div className="flex-1 mx-auto p-10 h-screen">
-                            <main>{children}</main>
-                        </div>
-                    </div>
+                <div className="flex-1 mx-auto h-screen">
+                    <main>{children}</main>
                 </div>
             </body>
         </html>

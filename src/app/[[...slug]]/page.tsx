@@ -5,10 +5,8 @@ import { QueryClientWrap } from '@/components/QueryClientWrap'
 
 export default async function Docs({}: { params: { slug?: string[] } }): Promise<ReactElement> {
     return (
-        <main>
-            <QueryClientWrap>
-                <Arkitektur />
-            </QueryClientWrap>
-        </main>
+        <QueryClientWrap>
+            <Arkitektur />
+        </QueryClientWrap>
     )
 }

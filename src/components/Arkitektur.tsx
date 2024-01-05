@@ -38,26 +38,27 @@ export const Arkitektur = (): ReactElement => {
     }
     return (
         <>
-            <div className="flex gap-2">
-                <UNSAFE_Combobox
-                    label="Namespace"
-                    options={alleNamespaces}
-                    isMultiSelect
-                    selectedOptions={namespaces}
-                    onToggleSelected={onToggleSelected}
-                />
-                <Select
-                    label="Miljø"
-                    value={env}
-                    onChange={(e) => {
-                        setEnv(e.target.value)
-                    }}
-                >
-                    <option value="prod">Produksjon</option>
-                    <option value="dev">Development</option>
-                </Select>
+            <div className="h-32 p-10">
+                <div className="flex gap-2">
+                    <UNSAFE_Combobox
+                        label="Namespace"
+                        options={alleNamespaces}
+                        isMultiSelect
+                        selectedOptions={namespaces}
+                        onToggleSelected={onToggleSelected}
+                    />
+                    <Select
+                        label="Miljø"
+                        value={env}
+                        onChange={(e) => {
+                            setEnv(e.target.value)
+                        }}
+                    >
+                        <option value="prod">Produksjon</option>
+                        <option value="dev">Development</option>
+                    </Select>
+                </div>
             </div>
-
             <Graph apper={data} namespaces={namespaces} />
         </>
     )
