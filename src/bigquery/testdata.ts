@@ -235,4 +235,27 @@ export const naisAppTestdata = [
             'nav-prod.teamsykmelding.syfo-narmesteleder',
         ],
     },
+    {
+        name: 'sykepengesoknad-dev',
+        cluster: 'dev-gcp',
+        namespace: 'flex',
+        ingresses: '["https://www.ekstern.dev.nav.no/syk//sykepengesoknad"]',
+        inbound_apps: [],
+        outbound_apps: [
+            'dev-gcp.flex.sykepengesoknad-backend',
+            'dev-gcp.flex.sykepengesoknad-kvitteringer',
+            'dev-gcp.flex.flexjar-backend',
+            'dev-gcp.okonomi.sokos-kontoregister-person',
+            'dev-gcp.teamsykmelding.sykmeldinger-backend',
+            'dev-gcp.personbruker.nav-dekoratoren',
+        ],
+        outbound_hosts: ['flex-unleash-api.nav.cloud.nais.io'],
+        read_topics: [
+            'nav-dev.aura.kafka-canary-dev-gcp',
+            'nav-dev.nais-verification.kafka-canary-dev',
+            'nav-dev.nais-verification.kafka-canary-dev-fss',
+            'nav-dev.nais-verification.kafka-canary-dev-gcp',
+        ],
+        write_topics: [],
+    },
 ]

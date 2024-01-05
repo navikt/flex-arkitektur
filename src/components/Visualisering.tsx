@@ -39,8 +39,7 @@ export const Visualisering = (): ReactElement => {
         <>
             <div className="flex gap-2">
                 <UNSAFE_Combobox
-                    label="Velg namespace"
-                    description="Du kan velge flere"
+                    label="Namespace"
                     options={alleNamespaces}
                     isMultiSelect
                     selectedOptions={namespaces}
@@ -48,7 +47,6 @@ export const Visualisering = (): ReactElement => {
                 />
                 <Select
                     label="Miljø"
-                    description="Velg det landet du tilbringer mest tid."
                     value={env}
                     onChange={(e) => {
                         setEnv(e.target.value)
