@@ -1,10 +1,11 @@
-import { ReactElement, useEffect, useRef } from 'react'
+import React, { ReactElement, useEffect, useRef } from 'react'
 import { Network, Node, Edge, Options } from 'vis-network'
 import { logger } from '@navikt/next-logger'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
+import { Chips } from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
-import { namespaceToColor } from '@/components/farger'
+import { namespaceToAkselColor, namespaceToColor } from '@/components/farger'
 
 export function Graph({
     apper,
@@ -110,13 +111,11 @@ export function Graph({
             logger.info('Rerenderer graf')
             forrigeNoder.current = nyeNoder
             forrigeEdges.current = nyeKanter
-
             const grupper = new Set<string>()
             data.nodes.forEach((node) => {
                 if (node.group === undefined) return
                 grupper.add(node.group)
             })
-
             const options: Options = {
                 groups: {
                     noAuthConnection: {
@@ -134,11 +133,10 @@ export function Graph({
                         align: 'left',
                         color: '#ffffff',
                     },
-                    color: { background: namespaceToColor(gruppe) },
+                    color: { background: namespaceToColor(gruppe), border: namespaceToColor(gruppe) },
                 }
             })
-            const network = new Network(container.current, data, options)
-            networkRef.current = network
+            networkRef.current = new Network(container.current, data, options)
         }
     }, [data])
 
@@ -161,7 +159,31 @@ export function Graph({
             }
         }
     }, [slettNoder, setSlettedeNoder])
-    return <div ref={container} style={{ height: 'calc(100vh - var(--a-spacing-32))' }} />
+    const grupper = new Set<string>()
+    data.nodes.forEach((node) => {
+        if (node.group === undefined) return
+        grupper.add(node.group)
+    })
+    return (
+        <>
+            <div ref={container} style={{ height: 'calc(100vh - var(--a-spacing-32))' }} />
+            <div style={{ position: 'absolute', zIndex: 1000, bottom: '10px', right: '20px' }}>
+                <Chips>
+                    {Array.from(grupper).map((namespace) => {
+                        return (
+                            <Chips.Toggle
+                                key={namespace}
+                                className={namespaceToAkselColor(namespace) + ' text-white'}
+                                checkmark={false}
+                            >
+                                {namespace}
+                            </Chips.Toggle>
+                        )
+                    })}
+                </Chips>
+            </div>
+        </>
+    )
 }
 
 function name(app: NaisApp): string {

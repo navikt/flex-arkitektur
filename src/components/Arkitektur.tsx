@@ -58,7 +58,7 @@ export const Arkitektur = (): ReactElement => {
                 element.setAttribute('style', `background-color: ${namespaceToColor(element.textContent || '')};`)
             })
         }
-    }, [namespaces])
+    }, [namespaces, data])
 
     if (!data || isFetching) {
         return <h2>Loading...</h2>
@@ -76,6 +76,7 @@ export const Arkitektur = (): ReactElement => {
             setNamespaces(namespaces.filter((o) => o !== option))
         }
     }
+
     return (
         <>
             <div className="h-32 p-10">
