@@ -4,18 +4,18 @@ import { logger } from '@navikt/next-logger'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
 import { Chips } from '@navikt/ds-react'
 
-import { NaisApp } from '@/types'
 import { namespaceToAkselColor, namespaceToColor } from '@/components/farger'
+import { ArkitekturNode } from '@/nodes/kalkulerNoder'
 
 export function Graph({
-    apper,
+    arkitekturNoder,
     namespaces,
     visKafka,
     slettNoder,
     filter,
     initielleSlettedeNoder,
 }: {
-    apper: NaisApp[]
+    arkitekturNoder: ArkitekturNode[]
     namespaces: string[]
     visKafka: boolean
     slettNoder: boolean
@@ -27,17 +27,20 @@ export function Graph({
     const forrigeNoder = useRef(new Set<string>())
     const forrigeEdges = useRef(new Set<string>())
     const networkRef = useRef<Network>()
-    const filtreteApper = apper
-        .filter((app) => namespaces.includes(app.namespace))
+    const filtreteApper = arkitekturNoder
         .filter((app) => {
-            return !initielleSlettedeNoder.includes(name(app))
+            if (app.namespace === undefined) return false
+            return namespaces.includes(app.namespace)
+        })
+        .filter((app) => {
+            return !initielleSlettedeNoder.includes(app.id)
         })
         .filter((app) => {
             if (filter.length === 0) {
                 return true
             }
             return filter.some((f) => {
-                return name(app).includes(f)
+                return app.id.includes(f)
             })
         })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,8 +51,8 @@ export function Graph({
     filtreteApper
         .map((app) => {
             return {
-                id: name(app),
-                label: `${namespaceToEmoji(app.namespace)} ${app.name}`,
+                id: app.id,
+                label: `${namespaceToEmoji(app.namespace || '')} ${app.navn}`,
                 shape: 'box',
                 group: app.namespace,
                 font: {
@@ -61,42 +64,44 @@ export function Graph({
         .forEach((node) => data.nodes?.push(node))
 
     if (visKafka) {
-        filtreteApper.forEach((app) => {
-            function parseKafka(topic: string, write: boolean): void {
-                if (initielleSlettedeNoder.includes(topic)) return
-                if (!data.nodes.find((node) => node.id === topic)) {
-                    const namespace = topic.split('.')[1]
-                    const topicNavn = topic.split('.')[2]
-                    data.nodes.push({
-                        id: topic,
-                        label: namespaceToEmoji(namespace) + ' ' + topicNavn,
-                        shape: 'ellipse',
-                        group: namespace,
-                        font: {
-                            face: 'monospace',
-                            align: 'left',
-                        },
+        filtreteApper
+            .filter((ap) => {
+                return ap.nodeType == 'app'
+            })
+            .forEach((app) => {
+                function parseKafka(topic: ArkitekturNode, write: boolean): void {
+                    if (initielleSlettedeNoder.includes(topic.id)) return
+                    if (!data.nodes.find((node) => node.id === topic.id)) {
+                        data.nodes.push({
+                            id: topic.id,
+                            label: namespaceToEmoji(topic.namespace || '') + ' ' + topic.navn,
+                            shape: 'box',
+                            group: topic.namespace,
+                            font: {
+                                face: 'monospace',
+                                align: 'left',
+                            },
+                        })
+                    }
+                    data.edges.push({
+                        from: topic.id,
+                        to: app.id,
+                        arrows: { to: { enabled: !write }, from: { enabled: write } },
                     })
                 }
-                data.edges.push({
-                    from: topic,
-                    to: name(app),
-                    arrows: { to: { enabled: !write }, from: { enabled: write } },
-                })
-            }
 
-            app.read_topics?.forEach((t) => {
-                parseKafka(t, false)
+                app.writeTopic?.forEach((t) => {
+                    parseKafka(t, true)
+                })
+                app.readTopic?.forEach((t) => {
+                    parseKafka(t, false)
+                })
             })
-            app.write_topics?.forEach((t) => {
-                parseKafka(t, true)
-            })
-        })
     }
 
     filtreteApper.forEach((app) => {
-        app.outbound_apps?.forEach((outboundApp) => {
-            data.edges.push({ from: name(app), to: outboundApp, arrows: { to: { enabled: true } } })
+        app.outgoingApp?.forEach((outboundApp) => {
+            data.edges.push({ from: app.id, to: outboundApp.id, arrows: { to: { enabled: true } } })
         })
     })
 
@@ -108,7 +113,7 @@ export function Graph({
             if (areSetsEqual(nyeNoder, forrigeNoder.current) && areSetsEqual(nyeKanter, forrigeEdges.current)) {
                 return
             }
-            logger.info('Rerenderer graf')
+            logger.info('Rerendrer graf')
             forrigeNoder.current = nyeNoder
             forrigeEdges.current = nyeKanter
             const grupper = new Set<string>()
@@ -184,10 +189,6 @@ export function Graph({
             </div>
         </>
     )
-}
-
-function name(app: NaisApp): string {
-    return `${app.cluster}.${app.namespace}.${app.name}`
 }
 
 function namespaceToEmoji(namespace: string): string {

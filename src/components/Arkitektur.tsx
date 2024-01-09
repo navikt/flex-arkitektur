@@ -1,5 +1,5 @@
 'use client'
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
 import { Alert, Button, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
@@ -8,6 +8,7 @@ import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
 import { Graph } from '@/components/Graph'
 import { namespaceToColor } from '@/components/farger'
+import { ArkitekturNode, kalkulerNoder } from '@/nodes/kalkulerNoder'
 
 export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
@@ -59,6 +60,12 @@ export const Arkitektur = (): ReactElement => {
             })
         }
     }, [namespaces, data])
+
+    const arkitekturNoder = useMemo(() => {
+        if (!data) return [] as ArkitekturNode[]
+
+        return kalkulerNoder(data)
+    }, [data])
 
     if (!data || isFetching) {
         return <h2>Loading...</h2>
@@ -140,7 +147,7 @@ export const Arkitektur = (): ReactElement => {
                 </div>
             </div>
             <Graph
-                apper={data}
+                arkitekturNoder={arkitekturNoder}
                 namespaces={namespaces}
                 visKafka={visKafka}
                 slettNoder={slettNoder}
