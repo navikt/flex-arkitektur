@@ -86,6 +86,7 @@ export function Graph({
                     data.edges.push({
                         from: topic.id,
                         to: app.id,
+                        dashes: true,
                         arrows: { to: { enabled: !write }, from: { enabled: write } },
                     })
                 }
