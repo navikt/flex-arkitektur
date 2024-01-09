@@ -9,18 +9,22 @@ import { ArkitekturNode } from '@/nodes/kalkulerNoder'
 
 export function Graph({
     arkitekturNoder,
-    namespaces,
+    valgteNamespaces,
     visKafka,
     slettNoder,
     filter,
     initielleSlettedeNoder,
+    sokemetode,
+    valgeApper,
 }: {
     arkitekturNoder: ArkitekturNode[]
-    namespaces: string[]
+    valgteNamespaces: string[]
     visKafka: boolean
     slettNoder: boolean
     filter: string[]
     initielleSlettedeNoder: string[]
+    sokemetode: string
+    valgeApper: string[]
 }): ReactElement {
     const container = useRef(null)
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
@@ -29,8 +33,13 @@ export function Graph({
     const networkRef = useRef<Network>()
     const filtreteApper = arkitekturNoder
         .filter((app) => {
+            if (sokemetode !== 'namespace') return true
             if (app.namespace === undefined) return false
-            return namespaces.includes(app.namespace)
+            return valgteNamespaces.includes(app.namespace)
+        })
+        .filter((app) => {
+            if (sokemetode !== 'app') return true
+            return valgeApper.includes(app.id)
         })
         .filter((app) => {
             return !initielleSlettedeNoder.includes(app.id)

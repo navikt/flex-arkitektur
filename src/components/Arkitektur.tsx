@@ -2,7 +2,7 @@
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
-import { Alert, Button, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
+import { Alert, Button, Radio, RadioGroup, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
@@ -12,6 +12,8 @@ import { ArkitekturNode, kalkulerNoder } from '@/nodes/kalkulerNoder'
 
 export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
+    const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('namespace'))
+
     const [visKafka, setVisKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
     const [slettNoder, setSlettNoder] = useState(false)
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
@@ -21,12 +23,16 @@ export const Arkitektur = (): ReactElement => {
         'slettedeNoder',
         parseAsArrayOf(parseAsString).withDefault([]),
     )
-
+    const [appFilter, setAppFilter] = useState('')
     const initielleSlettedeNoder = useRef(slettedeNoder)
 
     const [hasTyped, setHasTyped] = useState(false)
-    const comboboxRef = useRef<HTMLInputElement>(null)
-    const [namespaces, setNamespaces] = useQueryState('namespace', parseAsArrayOf(parseAsString).withDefault(['flex']))
+    const namespaceCombobox = useRef<HTMLInputElement>(null)
+    const [valgteNamespaces, setNamespaces] = useQueryState(
+        'namespace',
+        parseAsArrayOf(parseAsString).withDefault(['flex']),
+    )
+    const [valgeApper, setApper] = useQueryState('apper', parseAsArrayOf(parseAsString).withDefault([]))
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
         queryKey: [`nais-apper`, env],
         queryFn: async () => {
@@ -53,13 +59,14 @@ export const Arkitektur = (): ReactElement => {
     }, [filterTekst])
 
     useEffect(() => {
-        const elements = comboboxRef.current?.parentElement?.parentElement?.getElementsByClassName('navds-chips__chip')
+        const elements =
+            namespaceCombobox.current?.parentElement?.parentElement?.getElementsByClassName('navds-chips__chip')
         if (elements) {
             Array.from(elements).forEach((element) => {
                 element.setAttribute('style', `background-color: ${namespaceToColor(element.textContent || '')};`)
             })
         }
-    }, [namespaces, data])
+    }, [valgteNamespaces, data])
 
     const arkitekturNoder = useMemo(() => {
         if (!data) return [] as ArkitekturNode[]
@@ -76,26 +83,59 @@ export const Arkitektur = (): ReactElement => {
 
     // unike namespaces fra data
     const alleNamespaces = Array.from(new Set(data.map((app) => app.namespace))).sort()
-    const onToggleSelected = (option: string, isSelected: boolean): void => {
+    const alleApper = Array.from(new Set(arkitekturNoder.map((app) => app.id))).sort()
+    const onNamespaceSelected = (option: string, isSelected: boolean): void => {
         if (isSelected) {
-            setNamespaces([...namespaces, option])
+            setNamespaces([...valgteNamespaces, option])
         } else {
-            setNamespaces(namespaces.filter((o) => o !== option))
+            setNamespaces(valgteNamespaces.filter((o) => o !== option))
         }
     }
-
+    const onAppSelected = (option: string, isSelected: boolean): void => {
+        if (isSelected) {
+            setApper([...valgeApper, option])
+        } else {
+            setApper(valgeApper.filter((o) => o !== option))
+        }
+    }
     return (
         <>
             <div className="h-32 p-10">
                 <div className="flex gap-3">
-                    <UNSAFE_Combobox
-                        ref={comboboxRef}
-                        label="Namespace"
-                        options={alleNamespaces}
-                        isMultiSelect
-                        selectedOptions={namespaces}
-                        onToggleSelected={onToggleSelected}
-                    />
+                    <RadioGroup
+                        legend="Søkemetode"
+                        size="small"
+                        value={sokemetode}
+                        onChange={(val: string) => {
+                            setSokemetode(val)
+                        }}
+                    >
+                        <Radio value="namespace">Namespace</Radio>
+                        <Radio value="app">App / Api / Topic</Radio>
+                    </RadioGroup>
+                    {sokemetode == 'namespace' && (
+                        <UNSAFE_Combobox
+                            ref={namespaceCombobox}
+                            label="Namespace"
+                            options={alleNamespaces}
+                            isMultiSelect
+                            selectedOptions={valgteNamespaces}
+                            onToggleSelected={onNamespaceSelected}
+                        />
+                    )}
+                    {sokemetode == 'app' && (
+                        <UNSAFE_Combobox
+                            label="App / Api / Topic"
+                            options={alleApper}
+                            isMultiSelect
+                            filteredOptions={alleApper.filter((app) => app.includes(appFilter))}
+                            selectedOptions={valgeApper}
+                            onToggleSelected={onAppSelected}
+                            onChange={(e) => {
+                                setAppFilter(e?.target?.value || '')
+                            }}
+                        />
+                    )}
                     <Select
                         label="Miljø"
                         value={env}
@@ -139,6 +179,7 @@ export const Arkitektur = (): ReactElement => {
                                 setVisKafka(true)
                                 setSlettNoder(false)
                                 setSlettedeNoder([])
+                                setApper([])
                             }}
                         >
                             Reset
@@ -148,7 +189,9 @@ export const Arkitektur = (): ReactElement => {
             </div>
             <Graph
                 arkitekturNoder={arkitekturNoder}
-                namespaces={namespaces}
+                sokemetode={sokemetode}
+                valgeApper={valgeApper}
+                valgteNamespaces={valgteNamespaces}
                 visKafka={visKafka}
                 slettNoder={slettNoder}
                 filter={filter}

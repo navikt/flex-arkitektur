@@ -25,7 +25,7 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
 
     data.forEach((app) => {
         app.outbound_apps?.forEach((outboundApp) => {
-            const key = 'app.' + outboundApp
+            const key = outboundApp
             const out = nodeMap.get(key)
             if (out) {
                 nodeMap.get(name(app))?.outgoingApp.add(out)
@@ -70,5 +70,5 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
 }
 
 function name(app: NaisApp): string {
-    return `app.${app.cluster}.${app.namespace}.${app.name}`
+    return `${app.cluster}.${app.namespace}.${app.name}`
 }
