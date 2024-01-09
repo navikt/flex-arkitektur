@@ -75,6 +75,10 @@ export const Arkitektur = (): ReactElement => {
         return kalkulerNoder(data)
     }, [data])
 
+    const alleNamespaces = Array.from(new Set(data?.map((app) => app.namespace))).sort()
+    const alleApper = Array.from(new Set(arkitekturNoder.map((app) => app.id))).sort()
+
+    const filteredApper = useMemo(() => alleApper.filter((app) => app.includes(appFilter)), [alleApper, appFilter])
     if (!data || isFetching) {
         return <h2>Loading...</h2>
     }
@@ -83,8 +87,7 @@ export const Arkitektur = (): ReactElement => {
     }
 
     // unike namespaces fra data
-    const alleNamespaces = Array.from(new Set(data.map((app) => app.namespace))).sort()
-    const alleApper = Array.from(new Set(arkitekturNoder.map((app) => app.id))).sort()
+
     const onNamespaceSelected = (option: string, isSelected: boolean): void => {
         if (isSelected) {
             setNamespaces([...valgteNamespaces, option])
@@ -129,7 +132,7 @@ export const Arkitektur = (): ReactElement => {
                             label="App / Api / Topic"
                             options={alleApper}
                             isMultiSelect
-                            filteredOptions={alleApper.filter((app) => app.includes(appFilter))}
+                            filteredOptions={filteredApper}
                             selectedOptions={valgeApper}
                             onToggleSelected={onAppSelected}
                             onChange={(e) => {
