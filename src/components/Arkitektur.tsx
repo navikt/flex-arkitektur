@@ -1,7 +1,7 @@
 'use client'
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
+import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
 import { Alert, Button, Radio, RadioGroup, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
@@ -15,6 +15,7 @@ export const Arkitektur = (): ReactElement => {
     const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('namespace'))
 
     const [visKafka, setVisKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
+    const [nivaaer, setNivaaer] = useQueryState('nivaaer', parseAsInteger.withDefault(0))
     const [slettNoder, setSlettNoder] = useState(false)
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [filterTekst, setFilterTekst] = useState(filter.join(' '))
@@ -146,6 +147,20 @@ export const Arkitektur = (): ReactElement => {
                         <option value="prod">Produksjon</option>
                         <option value="dev">Utvikling</option>
                     </Select>
+                    <Select
+                        label="Nivåer"
+                        value={nivaaer + ''}
+                        onChange={(e) => {
+                            setNivaaer(Number(e.target.value))
+                        }}
+                    >
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="5">4</option>
+                        <option value="6">5</option>
+                    </Select>
                     <TextField
                         label="Filter"
                         value={filterTekst}
@@ -166,7 +181,7 @@ export const Arkitektur = (): ReactElement => {
                     </div>
                     <div className="self-end">
                         <Switch checked={slettNoder} onChange={() => setSlettNoder(!slettNoder)}>
-                            Slett noder med museklikk
+                            Slett
                         </Switch>
                     </div>
                     <div className="self-end">
