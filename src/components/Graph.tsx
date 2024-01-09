@@ -25,6 +25,7 @@ export function Graph({
     initielleSlettedeNoder: string[]
     sokemetode: string
     valgeApper: string[]
+    nivaaer: number
 }): ReactElement {
     const container = useRef(null)
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))

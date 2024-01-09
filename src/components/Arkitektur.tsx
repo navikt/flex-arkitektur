@@ -210,6 +210,7 @@ export const Arkitektur = (): ReactElement => {
                 visKafka={visKafka}
                 slettNoder={slettNoder}
                 filter={filter}
+                nivaaer={nivaaer}
                 initielleSlettedeNoder={initielleSlettedeNoder.current}
             />
         </>
