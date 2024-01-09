@@ -69,7 +69,7 @@ export function Graph({
                 return ap.nodeType == 'app'
             })
             .forEach((app) => {
-                function parseKafka(topic: ArkitekturNode, write: boolean): void {
+                function parseKafka(topic: ArkitekturNode, vei: 'read' | 'write' | 'readwrite'): void {
                     if (initielleSlettedeNoder.includes(topic.id)) return
                     if (!data.nodes.find((node) => node.id === topic.id)) {
                         data.nodes.push({
@@ -87,15 +87,23 @@ export function Graph({
                         from: topic.id,
                         to: app.id,
                         dashes: true,
-                        arrows: { to: { enabled: !write }, from: { enabled: write } },
+                        arrows: {
+                            to: { enabled: vei == 'read' || vei == 'readwrite' },
+                            from: { enabled: vei == 'write' || vei == 'readwrite' },
+                        },
                     })
                 }
 
                 app.writeTopic?.forEach((t) => {
-                    parseKafka(t, true)
+                    if (app.readTopic.has(t)) {
+                        parseKafka(t, 'readwrite')
+                    } else {
+                        parseKafka(t, 'write')
+                    }
                 })
                 app.readTopic?.forEach((t) => {
-                    parseKafka(t, false)
+                    if (app.writeTopic.has(t)) return
+                    parseKafka(t, 'read')
                 })
             })
     }
