@@ -146,7 +146,7 @@ export const Arkitektur = (): ReactElement => {
                     {sokemetode == 'app' && (
                         <UNSAFE_Combobox
                             label="App / Api / Topic"
-                            options={alleApper}
+                            options={filteredApper}
                             isMultiSelect
                             filteredOptions={filteredApper}
                             selectedOptions={valgeApper}
