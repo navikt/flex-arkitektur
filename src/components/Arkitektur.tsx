@@ -2,7 +2,7 @@
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
-import { Alert, Button, Radio, RadioGroup, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
+import { Alert, Button, Chips, Radio, RadioGroup, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
@@ -110,16 +110,10 @@ export const Arkitektur = (): ReactElement => {
             setNamespaces(valgteNamespaces.filter((o) => o !== option))
         }
     }
-    const onAppSelected = (option: string, isSelected: boolean): void => {
-        if (isSelected) {
-            setApper([...valgeApper, option])
-        } else {
-            setApper(valgeApper.filter((o) => o !== option))
-        }
-    }
+
     return (
         <>
-            <div className="h-32 p-10">
+            <div className="h-40 p-10">
                 <div className="flex gap-3">
                     <RadioGroup
                         legend="Søkemetode"
@@ -145,13 +139,15 @@ export const Arkitektur = (): ReactElement => {
                     {sokemetode == 'app' && (
                         <UNSAFE_Combobox
                             label="App / Api / Topic"
-                            options={[...filteredApper, ...valgeApper]}
-                            isMultiSelect
+                            options={[...filteredApper]}
+                            clearButton={true}
                             filteredOptions={filteredApper}
-                            selectedOptions={valgeApper}
-                            onToggleSelected={onAppSelected}
+                            selectedOptions={[]}
+                            onToggleSelected={(e) => {
+                                if (e) setApper([...valgeApper, e])
+                            }}
                             onChange={(e) => {
-                                setAppFilter(e?.target?.value || '')
+                                if (e?.target?.value) setAppFilter(e.target.value)
                             }}
                         />
                     )}
@@ -179,19 +175,22 @@ export const Arkitektur = (): ReactElement => {
                         <option value="5">4</option>
                         <option value="6">5</option>
                     </Select>
-                    <TextField
-                        label="Filter"
-                        value={filterTekst}
-                        onChange={(e) => {
-                            setFilterTekst(e.target.value)
-                            setHasTyped(true)
-                        }}
-                        onKeyUp={(e) => {
-                            if (e.key === 'Enter') {
-                                setFilter(filterTekst.split(' '))
-                            }
-                        }}
-                    />
+                    {sokemetode == 'namespace' && (
+                        <TextField
+                            label="Filter"
+                            value={filterTekst}
+                            onChange={(e) => {
+                                setFilterTekst(e.target.value)
+                                setHasTyped(true)
+                            }}
+                            onKeyUp={(e) => {
+                                if (e.key === 'Enter') {
+                                    setFilter(filterTekst.split(' '))
+                                }
+                            }}
+                        />
+                    )}
+
                     <div className="self-end">
                         <Switch checked={visKafka} onChange={() => setVisKafka(!visKafka)}>
                             Vis Kafka
@@ -218,6 +217,20 @@ export const Arkitektur = (): ReactElement => {
                             Reset
                         </Button>
                     </div>
+                </div>
+                <div className="mt-2">
+                    <Chips>
+                        {valgeApper.map((app) => (
+                            <Chips.Removable
+                                key={app}
+                                onDelete={() => {
+                                    setApper(valgeApper.filter((o) => o !== app))
+                                }}
+                            >
+                                {app}
+                            </Chips.Removable>
+                        ))}
+                    </Chips>
                 </div>
             </div>
             <Graph

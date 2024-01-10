@@ -190,7 +190,7 @@ export function Graph({
     })
     return (
         <>
-            <div ref={container} style={{ height: 'calc(100vh - var(--a-spacing-32))' }} />
+            <div ref={container} style={{ height: 'calc(100vh - 20vh' }} />
             <div style={{ position: 'absolute', zIndex: 1000, bottom: '10px', right: '20px' }}>
                 <Chips>
                     {Array.from(grupper).map((namespace) => {
