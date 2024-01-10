@@ -9,6 +9,7 @@ import { fetchJsonMedRequestId } from '@/utlis/fetch'
 import { Graph } from '@/components/Graph'
 import { namespaceToColor } from '@/components/farger'
 import { ArkitekturNode, kalkulerNoder } from '@/nodes/kalkulerNoder'
+import { Trie } from '@/trie/Trie'
 
 export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
@@ -77,8 +78,23 @@ export const Arkitektur = (): ReactElement => {
 
     const alleNamespaces = Array.from(new Set(data?.map((app) => app.namespace))).sort()
     const alleApper = Array.from(new Set(arkitekturNoder.map((app) => app.id))).sort()
+    const trie = useMemo(() => {
+        const minTrie = new Trie()
+        arkitekturNoder.forEach((app) => {
+            if (app.namespace) minTrie.insert(app.namespace, app)
+            minTrie.insert(app.navn, app)
+        })
 
-    const filteredApper = useMemo(() => alleApper.filter((app) => app.includes(appFilter)), [alleApper, appFilter])
+        return minTrie
+    }, [arkitekturNoder])
+
+    const filteredApper = useMemo(() => {
+        if (appFilter.length < 3) {
+            return []
+        }
+
+        return trie.findAllWithPrefix(appFilter).map((app) => app.id)
+    }, [trie, appFilter])
     if (!data || isFetching) {
         return <h2>Loading...</h2>
     }
