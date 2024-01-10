@@ -77,7 +77,6 @@ export const Arkitektur = (): ReactElement => {
     }, [data])
 
     const alleNamespaces = Array.from(new Set(data?.map((app) => app.namespace))).sort()
-    const alleApper = Array.from(new Set(arkitekturNoder.map((app) => app.id))).sort()
     const trie = useMemo(() => {
         const minTrie = new Trie()
         arkitekturNoder.forEach((app) => {
