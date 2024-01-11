@@ -19,20 +19,39 @@ export class ArkitekturNode {
 
 export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
     const nodeMap = new Map<string, ArkitekturNode>()
-
+    const ingessMap = new Map<string, ArkitekturNode>()
     data.forEach((app) => {
-        nodeMap.set(name(app), new ArkitekturNode(name(app), app.name, app.namespace, 'app'))
+        const arkitekturNode = new ArkitekturNode(name(app), app.name, app.namespace, 'app')
+        nodeMap.set(name(app), arkitekturNode)
+        app.ingresses?.forEach((ingress) => {
+            //Fjerner trailing slash hvis den finnes
+            if (ingress.endsWith('/')) {
+                ingress = ingress.slice(0, -1)
+            }
+
+            ingessMap.set(ingress, arkitekturNode)
+        })
     })
 
     data.forEach((app) => {
         app.outbound_hosts?.forEach((hostUrl) => {
+            const fssExternalHost = ingessMap.get('https://' + hostUrl)
+            const appArkitekturnode = nodeMap.get(name(app))
+            if (!appArkitekturnode) {
+                throw new Error('appArkitekturnode is undefined')
+            }
+            if (fssExternalHost) {
+                appArkitekturnode.outgoingApp.add(fssExternalHost)
+                fssExternalHost.incomingApp.add(appArkitekturnode)
+                return
+            }
             let outHost = nodeMap.get(hostUrl)
             if (!outHost) {
                 outHost = new ArkitekturNode(hostUrl, hostUrl, undefined, 'ekstern')
                 nodeMap.set(hostUrl, outHost)
             }
 
-            nodeMap.get(name(app))?.outgoingHost.add(outHost)
+            appArkitekturnode.outgoingHost.add(outHost)
         })
     })
     data.forEach((app) => {
