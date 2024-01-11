@@ -2,7 +2,18 @@
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
-import { Alert, Button, Chips, Radio, RadioGroup, Select, Switch, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
+import {
+    Alert,
+    Button,
+    Chips,
+    Loader,
+    Radio,
+    RadioGroup,
+    Select,
+    Switch,
+    TextField,
+    UNSAFE_Combobox,
+} from '@navikt/ds-react'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
@@ -94,11 +105,13 @@ export const Arkitektur = (): ReactElement => {
 
         return trie.findAllWithPrefix(appFilter).map((app) => app.id)
     }, [trie, appFilter])
-    if (!data || isFetching) {
-        return <h2>Loading...</h2>
-    }
+
     if (error) {
-        return <Alert variant="error">Kunne ikke hente data fra api</Alert>
+        return (
+            <Alert className="m-10" variant="error">
+                Kunne ikke hente data. Prøv igjen senere eller sjekk logger og nettleser console.
+            </Alert>
+        )
     }
 
     // unike namespaces fra data
@@ -143,8 +156,11 @@ export const Arkitektur = (): ReactElement => {
                             clearButton={true}
                             filteredOptions={filteredApper}
                             selectedOptions={[]}
-                            onToggleSelected={(e) => {
-                                if (e) setApper([...valgeApper, e])
+                            onToggleSelected={(app) => {
+                                if (app) {
+                                    if (valgeApper.includes(app)) return
+                                    setApper([...valgeApper, app])
+                                }
                             }}
                             onChange={(e) => {
                                 if (e?.target?.value) setAppFilter(e.target.value)
@@ -233,17 +249,26 @@ export const Arkitektur = (): ReactElement => {
                     </Chips>
                 </div>
             </div>
-            <Graph
-                arkitekturNoder={arkitekturNoder}
-                sokemetode={sokemetode}
-                valgeApper={valgeApper}
-                valgteNamespaces={valgteNamespaces}
-                visKafka={visKafka}
-                slettNoder={slettNoder}
-                filter={filter}
-                nivaaer={nivaaer}
-                initielleSlettedeNoder={initielleSlettedeNoder.current}
-            />
+            {isFetching && (
+                <div className="flex justify-center items-center h-[60vh] w-100">
+                    <div>
+                        <Loader size="3xlarge" title="Venter..." />
+                    </div>
+                </div>
+            )}
+            {!isFetching && (
+                <Graph
+                    arkitekturNoder={arkitekturNoder}
+                    sokemetode={sokemetode}
+                    valgeApper={valgeApper}
+                    valgteNamespaces={valgteNamespaces}
+                    visKafka={visKafka}
+                    slettNoder={slettNoder}
+                    filter={filter}
+                    nivaaer={nivaaer}
+                    initielleSlettedeNoder={initielleSlettedeNoder.current}
+                />
+            )}
         </>
     )
 }
