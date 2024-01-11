@@ -1,11 +1,13 @@
 import React, { ReactElement, useEffect, useRef } from 'react'
-import { Network, Node, Edge, Options } from 'vis-network'
+import { Network, Options } from 'vis-network'
 import { logger } from '@navikt/next-logger'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
 import { Chips } from '@navikt/ds-react'
 
-import { namespaceToAkselColor, namespaceToColor } from '@/components/farger'
 import { ArkitekturNode } from '@/nodes/kalkulerNoder'
+import { filtrerArkitekturNoder } from '@/nodes/filtrerNoder'
+import { kalkulerNoderOgKanter } from '@/nodes/kalkulerNoderOgKanter'
+import { namespaceToAkselColor, namespaceToColor } from '@/namespace/farger'
 
 export function Graph({
     arkitekturNoder,
@@ -32,114 +34,15 @@ export function Graph({
     const forrigeNoder = useRef(new Set<string>())
     const forrigeEdges = useRef(new Set<string>())
     const networkRef = useRef<Network>()
-    const filtreteApper = arkitekturNoder
-        .filter((app) => {
-            if (sokemetode !== 'namespace') return true
-            if (app.namespace === undefined) return false
-            return valgteNamespaces.includes(app.namespace)
-        })
-        .filter((app) => {
-            if (sokemetode !== 'app') return true
-            return valgeApper.includes(app.id)
-        })
-        .filter((app) => {
-            return !initielleSlettedeNoder.includes(app.id)
-        })
-        .filter((app) => {
-            if (filter.length === 0) {
-                return true
-            }
-            return filter.some((f) => {
-                return app.id.includes(f)
-            })
-        })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const data = {
-        nodes: [] as Node[],
-        edges: [] as Edge[],
-    }
-    filtreteApper
-        .map((app) => {
-            return {
-                id: app.id,
-                label: `${namespaceToEmoji(app.namespace || '')} ${app.navn}`,
-                shape: 'box',
-                group: app.namespace,
-                font: {
-                    face: 'monospace',
-                    align: 'left',
-                },
-            }
-        })
-        .forEach((node) => data.nodes?.push(node))
-
-    if (visKafka) {
-        filtreteApper
-            .filter((ap) => {
-                return ap.nodeType == 'app'
-            })
-            .forEach((app) => {
-                function parseKafka(topic: ArkitekturNode, vei: 'read' | 'write' | 'readwrite'): void {
-                    if (initielleSlettedeNoder.includes(topic.id)) return
-                    if (!data.nodes.find((node) => node.id === topic.id)) {
-                        data.nodes.push({
-                            id: topic.id,
-                            label: namespaceToEmoji(topic.namespace || '') + ' ' + topic.navn,
-                            shape: 'box',
-                            group: topic.namespace,
-                            font: {
-                                face: 'monospace',
-                                align: 'left',
-                            },
-                        })
-                    }
-                    data.edges.push({
-                        from: topic.id,
-                        to: app.id,
-                        dashes: true,
-                        arrows: {
-                            to: { enabled: vei == 'read' || vei == 'readwrite' },
-                            from: { enabled: vei == 'write' || vei == 'readwrite' },
-                        },
-                    })
-                }
-
-                app.writeTopic?.forEach((t) => {
-                    if (app.readTopic.has(t)) {
-                        parseKafka(t, 'readwrite')
-                    } else {
-                        parseKafka(t, 'write')
-                    }
-                })
-                app.readTopic?.forEach((t) => {
-                    if (app.writeTopic.has(t)) return
-                    parseKafka(t, 'read')
-                })
-            })
-    }
-
-    filtreteApper.forEach((app) => {
-        app.outgoingHost?.forEach((outHost) => {
-            if (!data.nodes.find((node) => node.id === outHost.id)) {
-                data.nodes.push({
-                    id: outHost.id,
-                    label: outHost.id,
-                    shape: 'box',
-                    group: 'extern',
-                    font: {
-                        face: 'monospace',
-                        align: 'left',
-                    },
-                })
-            }
-            data.edges.push({ from: app.id, to: outHost.id, arrows: { to: { enabled: true } } })
-        })
-    })
-    filtreteApper.forEach((app) => {
-        app.outgoingApp?.forEach((outboundApp) => {
-            data.edges.push({ from: app.id, to: outboundApp.id, arrows: { to: { enabled: true } } })
-        })
-    })
+    const filtreteApper = filtrerArkitekturNoder(
+        arkitekturNoder,
+        valgteNamespaces,
+        valgeApper,
+        initielleSlettedeNoder,
+        filter,
+        sokemetode,
+    )
+    const data = kalkulerNoderOgKanter(filtreteApper, visKafka, initielleSlettedeNoder)
 
     useEffect(() => {
         if (container.current) {
@@ -225,33 +128,6 @@ export function Graph({
             </div>
         </>
     )
-}
-
-function namespaceToEmoji(namespace: string): string {
-    switch (namespace) {
-        case 'teamsykmelding':
-            return '💉'
-        case 'flex':
-            return '💪'
-        case 'team-esyfo':
-            return '🫂'
-        case 'risk':
-            return '☣️'
-        case 'teamsykefravr':
-            return '🏥'
-        case 'helsearbeidsgiver':
-            return '🧑‍💼'
-        case 'personbruker':
-            return '🧑🏽'
-        default:
-            return randomEmojiFromHash(namespace)
-    }
-}
-
-function randomEmojiFromHash(namespace: string): string {
-    const emojies = ['👾', '🤖', '👽', '👻', '👹', '🤡', '👁', '👀', '🧠', '🦾', '🦿', '🧬', '🧫', '🧪']
-    const hash = namespace.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    return emojies[hash % emojies.length]
 }
 
 function areSetsEqual(setA: Set<string>, setB: Set<string>): boolean {

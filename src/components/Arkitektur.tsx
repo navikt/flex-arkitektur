@@ -18,9 +18,9 @@ import {
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
 import { Graph } from '@/components/Graph'
-import { namespaceToColor } from '@/components/farger'
 import { ArkitekturNode, kalkulerNoder } from '@/nodes/kalkulerNoder'
 import { Trie } from '@/trie/Trie'
+import { namespaceToColor } from '@/namespace/farger'
 
 export const Arkitektur = (): ReactElement => {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
