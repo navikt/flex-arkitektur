@@ -1,14 +1,23 @@
-import { BigQuery } from '@google-cloud/bigquery'
+import { BigQuery, BigQueryOptions } from '@google-cloud/bigquery'
+import { logger } from '@navikt/next-logger'
 
 import { isLocalOrDemo } from '@/utlis/env'
 import { NaisApp } from '@/types'
 import { naisAppTestdata } from '@/bigquery/testdata'
 
 export async function hentNaisApper(): Promise<NaisApp[]> {
-    if (isLocalOrDemo) {
+    if (isLocalOrDemo && process.env.LOCAL_TESTDATA === 'true') {
+        logger.info('Henter naisapper fra lokal testdata')
+
         return mapResponse(naisAppTestdata)
     }
-    const bigquery = new BigQuery()
+    logger.info('Henter naisapper fra bigquery')
+
+    const options: BigQueryOptions = {}
+    if (process.env.GOOGLE_CLOUD_PROJECT) {
+        options.projectId = process.env.GOOGLE_CLOUD_PROJECT
+    }
+    const bigquery = new BigQuery(options)
     const bqTabell = '`aura-prod-d7e3.dataproduct_apps.dataproduct_apps_unique_v3`'
     const query = `SELECT name,
                           cluster,

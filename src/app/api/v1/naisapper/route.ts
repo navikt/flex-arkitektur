@@ -16,7 +16,6 @@ export async function GET(req: Request): Promise<NextResponse<NaisApp[]>> {
     const cluster = params.get('env') || 'prod'
 
     if (!cachedData || currentTime - lastFetchTime > 3600000 * cacheTimer) {
-        logger.info('Henter naisapper fra bigquery')
         cachedData = await hentNaisApper()
         lastFetchTime = currentTime
     } else {
