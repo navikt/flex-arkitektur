@@ -119,6 +119,23 @@ export function Graph({
     }
 
     filtreteApper.forEach((app) => {
+        app.outgoingHost?.forEach((outHost) => {
+            if (!data.nodes.find((node) => node.id === outHost.id)) {
+                data.nodes.push({
+                    id: outHost.id,
+                    label: outHost.id,
+                    shape: 'box',
+                    group: 'extern',
+                    font: {
+                        face: 'monospace',
+                        align: 'left',
+                    },
+                })
+            }
+            data.edges.push({ from: app.id, to: outHost.id, arrows: { to: { enabled: true } } })
+        })
+    })
+    filtreteApper.forEach((app) => {
         app.outgoingApp?.forEach((outboundApp) => {
             data.edges.push({ from: app.id, to: outboundApp.id, arrows: { to: { enabled: true } } })
         })

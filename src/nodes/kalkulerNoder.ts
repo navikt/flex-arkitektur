@@ -7,6 +7,7 @@ export class ArkitekturNode {
     public incomingApp = new Set<ArkitekturNode>()
     public writeTopic = new Set<ArkitekturNode>()
     public readTopic = new Set<ArkitekturNode>()
+    public outgoingHost = new Set<ArkitekturNode>()
 
     constructor(
         public id: string,
@@ -24,9 +25,19 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
     })
 
     data.forEach((app) => {
+        app.outbound_hosts?.forEach((hostUrl) => {
+            let outHost = nodeMap.get(hostUrl)
+            if (!outHost) {
+                outHost = new ArkitekturNode(hostUrl, hostUrl, undefined, 'ekstern')
+                nodeMap.set(hostUrl, outHost)
+            }
+
+            nodeMap.get(name(app))?.outgoingHost.add(outHost)
+        })
+    })
+    data.forEach((app) => {
         app.outbound_apps?.forEach((outboundApp) => {
-            const key = outboundApp
-            const out = nodeMap.get(key)
+            const out = nodeMap.get(outboundApp)
             if (out) {
                 nodeMap.get(name(app))?.outgoingApp.add(out)
                 out.incomingApp.add(nodeMap.get(name(app)) as ArkitekturNode)

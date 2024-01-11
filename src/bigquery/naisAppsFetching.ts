@@ -50,7 +50,7 @@ function mapResponse(rows: any[]): NaisApp[] {
         }
 
         function parseOgSett(
-            key: 'ingresses' | 'inbound_apps' | 'outbound_apps' | 'read_topics' | 'write_topics',
+            key: 'ingresses' | 'inbound_apps' | 'outbound_apps' | 'read_topics' | 'write_topics' | 'outbound_hosts',
         ): void {
             const data = parseStringArray(row[key])
             if (data && data.length > 0) {
@@ -64,6 +64,7 @@ function mapResponse(rows: any[]): NaisApp[] {
         parseOgSett('outbound_apps')
         parseOgSett('read_topics')
         parseOgSett('write_topics')
+        parseOgSett('outbound_hosts')
 
         return newVar
     })
