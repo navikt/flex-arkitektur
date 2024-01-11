@@ -45,7 +45,7 @@ export const Arkitektur = (): ReactElement => {
         'namespace',
         parseAsArrayOf(parseAsString).withDefault(['flex']),
     )
-    const [valgeApper, setApper] = useQueryState('apper', parseAsArrayOf(parseAsString).withDefault([]))
+    const [valgteApper, setApper] = useQueryState('apper', parseAsArrayOf(parseAsString).withDefault([]))
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
         queryKey: [`nais-apper`, env],
         queryFn: async () => {
@@ -91,7 +91,6 @@ export const Arkitektur = (): ReactElement => {
     const trie = useMemo(() => {
         const minTrie = new Trie()
         arkitekturNoder.forEach((app) => {
-            if (app.namespace) minTrie.insert(app.namespace, app)
             minTrie.insert(app.navn, app)
         })
 
@@ -103,8 +102,11 @@ export const Arkitektur = (): ReactElement => {
             return []
         }
 
-        return trie.findAllWithPrefix(appFilter).map((app) => app.id)
-    }, [trie, appFilter])
+        return trie
+            .findAllWithPrefix(appFilter)
+            .map((app) => app.id)
+            .filter((app) => !valgteApper.includes(app))
+    }, [trie, appFilter, valgteApper])
 
     if (error) {
         return (
@@ -152,14 +154,15 @@ export const Arkitektur = (): ReactElement => {
                     {sokemetode == 'app' && (
                         <UNSAFE_Combobox
                             label="App / Api / Topic"
+                            className="w-96"
                             options={[...filteredApper]}
                             clearButton={true}
                             filteredOptions={filteredApper}
                             selectedOptions={[]}
                             onToggleSelected={(app) => {
                                 if (app) {
-                                    if (valgeApper.includes(app)) return
-                                    setApper([...valgeApper, app])
+                                    if (valgteApper.includes(app)) return
+                                    setApper([...valgteApper, app])
                                 }
                             }}
                             onChange={(e) => {
@@ -236,11 +239,11 @@ export const Arkitektur = (): ReactElement => {
                 </div>
                 <div className="mt-2">
                     <Chips>
-                        {valgeApper.map((app) => (
+                        {valgteApper.map((app) => (
                             <Chips.Removable
                                 key={app}
                                 onDelete={() => {
-                                    setApper(valgeApper.filter((o) => o !== app))
+                                    setApper(valgteApper.filter((o) => o !== app))
                                 }}
                             >
                                 {app}
@@ -260,7 +263,7 @@ export const Arkitektur = (): ReactElement => {
                 <Graph
                     arkitekturNoder={arkitekturNoder}
                     sokemetode={sokemetode}
-                    valgeApper={valgeApper}
+                    valgeApper={valgteApper}
                     valgteNamespaces={valgteNamespaces}
                     visKafka={visKafka}
                     slettNoder={slettNoder}
