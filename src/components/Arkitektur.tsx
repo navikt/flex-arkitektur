@@ -2,18 +2,8 @@
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
-import {
-    Alert,
-    Button,
-    Chips,
-    Loader,
-    Radio,
-    RadioGroup,
-    Select,
-    Switch,
-    TextField,
-    UNSAFE_Combobox,
-} from '@navikt/ds-react'
+import { Alert, Button, Chips, Loader, Radio, RadioGroup, Select, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
+import { CogIcon } from '@navikt/aksel-icons'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
@@ -21,21 +11,19 @@ import { Graph } from '@/components/Graph'
 import { ArkitekturNode, kalkulerNoder } from '@/nodes/kalkulerNoder'
 import { Trie } from '@/trie/Trie'
 import { namespaceToColor } from '@/namespace/farger'
+import { SideMeny } from '@/components/SideMeny'
 
 export const Arkitektur = (): ReactElement => {
-    const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
+    const [env] = useQueryState('env', parseAsString.withDefault('prod'))
     const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('namespace'))
 
-    const [visKafka, setVisKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
+    const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
     const [nivaaer, setNivaaer] = useQueryState('nivaaer', parseAsInteger.withDefault(0))
     const [slettNoder, setSlettNoder] = useState(false)
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [filterTekst, setFilterTekst] = useState(filter.join(' '))
     const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
-    const [slettedeNoder, setSlettedeNoder] = useQueryState(
-        'slettedeNoder',
-        parseAsArrayOf(parseAsString).withDefault([]),
-    )
+    const [slettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
     const [appFilter, setAppFilter] = useState('')
     const initielleSlettedeNoder = useRef(slettedeNoder)
 
@@ -46,6 +34,7 @@ export const Arkitektur = (): ReactElement => {
         parseAsArrayOf(parseAsString).withDefault(['flex']),
     )
     const [valgteApper, setApper] = useQueryState('apper', parseAsArrayOf(parseAsString).withDefault([]))
+    const [sideMenyOpen, setSideMenyOpen] = useState(false)
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
         queryKey: [`nais-apper`, env],
         queryFn: async () => {
@@ -170,16 +159,7 @@ export const Arkitektur = (): ReactElement => {
                             }}
                         />
                     )}
-                    <Select
-                        label="Miljø"
-                        value={env}
-                        onChange={(e) => {
-                            setEnv(e.target.value)
-                        }}
-                    >
-                        <option value="prod">Produksjon</option>
-                        <option value="dev">Utvikling</option>
-                    </Select>
+
                     <Select
                         label="Nivåer"
                         value={nivaaer + ''}
@@ -211,30 +191,11 @@ export const Arkitektur = (): ReactElement => {
                     )}
 
                     <div className="self-end">
-                        <Switch checked={visKafka} onChange={() => setVisKafka(!visKafka)}>
-                            Vis Kafka
-                        </Switch>
-                    </div>
-                    <div className="self-end">
-                        <Switch checked={slettNoder} onChange={() => setSlettNoder(!slettNoder)}>
-                            Slett
-                        </Switch>
-                    </div>
-                    <div className="self-end">
                         <Button
                             variant="secondary-neutral"
-                            onClick={() => {
-                                setFilter([])
-                                setFilterTekst('')
-                                setNamespaces(['flex'])
-                                setVisKafka(true)
-                                setSlettNoder(false)
-                                setSlettedeNoder([])
-                                setApper([])
-                            }}
-                        >
-                            Reset
-                        </Button>
+                            onClick={() => setSideMenyOpen(!sideMenyOpen)}
+                            icon={<CogIcon title="Innstillinger" />}
+                        />
                     </div>
                 </div>
                 <div className="mt-2">
@@ -272,6 +233,14 @@ export const Arkitektur = (): ReactElement => {
                     initielleSlettedeNoder={initielleSlettedeNoder.current}
                 />
             )}
+            <SideMeny
+                slettNoder={slettNoder}
+                setSlettNoder={setSlettNoder}
+                openState={sideMenyOpen}
+                setOpenState={setSideMenyOpen}
+                setNamespaces={setNamespaces}
+                setApper={setApper}
+            ></SideMeny>
         </>
     )
 }

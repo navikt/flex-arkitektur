@@ -84,7 +84,7 @@ export function kalkulerNoderOgKanter(
                     id: outHost.id,
                     label: outHost.id,
                     shape: 'box',
-                    group: 'extern',
+                    group: 'ekstern',
                     font: {
                         face: 'monospace',
                         align: 'left',
