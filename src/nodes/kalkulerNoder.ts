@@ -8,7 +8,9 @@ export class ArkitekturNode {
     public writeTopic = new Set<ArkitekturNode>()
     public readTopic = new Set<ArkitekturNode>()
     public outgoingHost = new Set<ArkitekturNode>()
-    public incomingHost = new Set<ArkitekturNode>()
+    public blirKalltAvApp = new Set<ArkitekturNode>()
+    public blirLestAvApp = new Set<ArkitekturNode>()
+    public blirSkrevetTilAvApp = new Set<ArkitekturNode>()
 
     constructor(
         public id: string,
@@ -53,7 +55,7 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
             }
 
             appArkitekturnode.outgoingHost.add(outHost)
-            outHost.incomingHost.add(appArkitekturnode)
+            outHost.blirKalltAvApp.add(appArkitekturnode)
         })
     })
     data.forEach((app) => {
@@ -82,14 +84,14 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
             const topicet = nodeMap.get(topic)
             if (topicet) {
                 nodeMap.get(name(app))?.writeTopic.add(topicet)
-                topicet.writeTopic.add(nodeMap.get(name(app)) as ArkitekturNode)
+                topicet.blirSkrevetTilAvApp.add(nodeMap.get(name(app)) as ArkitekturNode)
             }
         })
         app.read_topics?.forEach((topic) => {
             const topicet = nodeMap.get(topic)
             if (topicet) {
                 nodeMap.get(name(app))?.readTopic.add(topicet)
-                topicet.readTopic.add(nodeMap.get(name(app)) as ArkitekturNode)
+                topicet.blirLestAvApp.add(nodeMap.get(name(app)) as ArkitekturNode)
             }
         })
     })

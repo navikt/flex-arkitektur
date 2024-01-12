@@ -22,7 +22,6 @@ export function kalkulerNoderOgKanter(
     filtreteApper.forEach((node) => noderBerortUt.set(node.id, node))
 
     function parseUtgaende(niva: number): void {
-        //klone noderberort map
         const klon = new Map<string, ArkitekturNode>()
         noderBerortUt.forEach((node) => klon.set(node.id, node))
 
@@ -39,8 +38,11 @@ export function kalkulerNoderOgKanter(
                 })
             }
             if (visKafka) {
-                node.writeTopic.forEach((out) => {
+                node.readTopic.forEach((out) => {
                     noderBerortUt.set(out.id, out)
+                })
+                node.blirLestAvApp.forEach((inn) => {
+                    noderBerortUt.set(inn.id, inn)
                 })
             }
         })
@@ -62,12 +64,15 @@ export function kalkulerNoderOgKanter(
                 })
             }
             if (visEksterne) {
-                node.incomingHost.forEach((inn) => {
+                node.blirKalltAvApp.forEach((inn) => {
                     noderBerortInn.set(inn.id, inn)
                 })
             }
             if (visKafka) {
-                node.readTopic.forEach((inn) => {
+                node.writeTopic.forEach((inn) => {
+                    noderBerortInn.set(inn.id, inn)
+                })
+                node.blirSkrevetTilAvApp.forEach((inn) => {
                     noderBerortInn.set(inn.id, inn)
                 })
             }
@@ -104,27 +109,32 @@ export function kalkulerNoderOgKanter(
         })
         node.outgoingHost.forEach((out) => {
             const outNode = innOgUtNoder.get(out.id)
-            if (outNode) {
+            if (outNode && visEksterne) {
                 data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
             }
         })
         node.outgoingApp.forEach((out) => {
             const outNode = innOgUtNoder.get(out.id)
-            if (outNode) {
+            if (outNode && visSynkrone) {
                 data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
             }
         })
-        if (node.nodeType == 'app') {
-            node.writeTopic.forEach((out) => {
+        if (node.nodeType == 'topic') {
+            node.blirLestAvApp.forEach((out) => {
                 const outNode = innOgUtNoder.get(out.id)
                 if (outNode) {
-                    data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
+                    data.edges.push({ dashes: true, from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
                 }
             })
-            node.readTopic.forEach((out) => {
+            node.blirSkrevetTilAvApp.forEach((out) => {
                 const outNode = innOgUtNoder.get(out.id)
                 if (outNode) {
-                    data.edges.push({ from: node.id, to: outNode.id, arrows: { from: { enabled: true } } })
+                    data.edges.push({
+                        dashes: true,
+                        from: node.id,
+                        to: outNode.id,
+                        arrows: { from: { enabled: true } },
+                    })
                 }
             })
         }
