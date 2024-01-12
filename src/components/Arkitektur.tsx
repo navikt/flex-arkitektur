@@ -15,10 +15,10 @@ import { SideMeny } from '@/components/SideMeny'
 
 export const Arkitektur = (): ReactElement => {
     const [env] = useQueryState('env', parseAsString.withDefault('prod'))
-    const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('namespace'))
+    const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('app'))
 
-    const [nivaaerUt, setNivaaerUt] = useQueryState('nivaaerUt', parseAsInteger.withDefault(0))
-    const [nivaaerInn, setNivaaerInn] = useQueryState('nivaaerInn', parseAsInteger.withDefault(0))
+    const [nivaaerUt, setNivaaerUt] = useQueryState('nivaaerUt', parseAsInteger.withDefault(1))
+    const [nivaaerInn, setNivaaerInn] = useQueryState('nivaaerInn', parseAsInteger.withDefault(1))
     const [slettNoder, setSlettNoder] = useState(false)
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [filterTekst, setFilterTekst] = useState(filter.join(' '))
@@ -33,7 +33,10 @@ export const Arkitektur = (): ReactElement => {
         'namespace',
         parseAsArrayOf(parseAsString).withDefault(['flex']),
     )
-    const [valgteApper, setApper] = useQueryState('apper', parseAsArrayOf(parseAsString).withDefault([]))
+    const [valgteApper, setApper] = useQueryState(
+        'apper',
+        parseAsArrayOf(parseAsString).withDefault(['prod-gcp.flex.sykepengesoknad-backend']),
+    )
     const [sideMenyOpen, setSideMenyOpen] = useState(false)
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
         queryKey: [`nais-apper`, env],
@@ -128,8 +131,8 @@ export const Arkitektur = (): ReactElement => {
                             setSokemetode(val)
                         }}
                     >
-                        <Radio value="namespace">Namespace</Radio>
                         <Radio value="app">App / Api / Topic</Radio>
+                        <Radio value="namespace">Namespace</Radio>
                     </RadioGroup>
                     {sokemetode == 'namespace' && (
                         <UNSAFE_Combobox
