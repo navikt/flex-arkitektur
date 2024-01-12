@@ -1,7 +1,7 @@
 'use client'
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
+import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
 import { Alert, Button, Chips, Loader, Radio, RadioGroup, Select, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
 import { CogIcon } from '@navikt/aksel-icons'
 
@@ -17,7 +17,6 @@ export const Arkitektur = (): ReactElement => {
     const [env] = useQueryState('env', parseAsString.withDefault('prod'))
     const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('namespace'))
 
-    const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
     const [nivaaerUt, setNivaaerUt] = useQueryState('nivaaerUt', parseAsInteger.withDefault(0))
     const [nivaaerInn, setNivaaerInn] = useQueryState('nivaaerInn', parseAsInteger.withDefault(0))
     const [slettNoder, setSlettNoder] = useState(false)
@@ -242,7 +241,6 @@ export const Arkitektur = (): ReactElement => {
                     sokemetode={sokemetode}
                     valgeApper={valgteApper}
                     valgteNamespaces={valgteNamespaces}
-                    visKafka={visKafka}
                     slettNoder={slettNoder}
                     filter={filter}
                     nivaaerUt={nivaaerUt}

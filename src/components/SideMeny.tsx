@@ -22,6 +22,8 @@ export function SideMeny({
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
 
     const [visKafka, setVisKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
+    const [visSynkroneAppKall, setVisSynkroneAppKall] = useQueryState('synkroneKall', parseAsBoolean.withDefault(true))
+    const [visEksterneKall, setVisEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [, setFilterTekst] = useState(filter.join(' '))
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
@@ -67,7 +69,13 @@ export function SideMeny({
                         </Select>
                     </div>
                     <Switch checked={visKafka} onChange={() => setVisKafka(!visKafka)}>
-                        Vis Kafka
+                        Kafka avhengigheter
+                    </Switch>
+                    <Switch checked={visSynkroneAppKall} onChange={() => setVisSynkroneAppKall(!visSynkroneAppKall)}>
+                        Synkrone avhengigheter
+                    </Switch>
+                    <Switch checked={visEksterneKall} onChange={() => setVisEksterneKall(!visEksterneKall)}>
+                        Eksterne synkrone avhengigheter
                     </Switch>
                     <Switch checked={slettNoder} onChange={() => setSlettNoder(!slettNoder)}>
                         Slett

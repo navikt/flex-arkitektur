@@ -11,51 +11,62 @@ interface NoderOgKanter {
 export function kalkulerNoderOgKanter(
     filtreteApper: ArkitekturNode[],
     visKafka: boolean,
+    visSynkrone: boolean,
+    visEksterne: boolean,
     initielleSlettedeNoder: string[],
     nivaaerInn: number,
     nivaaerUt: number,
 ): NoderOgKanter {
-    const noderBerort = new Map<string, ArkitekturNode>()
+    const noderBerortUt = new Map<string, ArkitekturNode>()
 
-    filtreteApper.forEach((node) => noderBerort.set(node.id, node))
+    filtreteApper.forEach((node) => noderBerortUt.set(node.id, node))
 
     function parseUtgaende(niva: number): void {
         //klone noderberort map
         const klon = new Map<string, ArkitekturNode>()
-        noderBerort.forEach((node) => klon.set(node.id, node))
+        noderBerortUt.forEach((node) => klon.set(node.id, node))
 
         if (niva > nivaaerUt) return
         klon.forEach((node) => {
-            node.outgoingApp.forEach((out) => {
-                noderBerort.set(out.id, out)
-            })
-            node.outgoingHost.forEach((out) => {
-                noderBerort.set(out.id, out)
-            })
+            if (visSynkrone) {
+                node.outgoingApp.forEach((out) => {
+                    noderBerortUt.set(out.id, out)
+                })
+            }
+            if (visEksterne) {
+                node.outgoingHost.forEach((out) => {
+                    noderBerortUt.set(out.id, out)
+                })
+            }
             if (visKafka) {
                 node.writeTopic.forEach((out) => {
-                    noderBerort.set(out.id, out)
+                    noderBerortUt.set(out.id, out)
                 })
             }
         })
         parseUtgaende(niva + 1)
     }
+    const noderBerortInn = new Map<string, ArkitekturNode>()
+
+    filtreteApper.forEach((node) => noderBerortInn.set(node.id, node))
 
     function parseInngaende(niva: number): void {
         const klon = new Map<string, ArkitekturNode>()
-        noderBerort.forEach((node) => klon.set(node.id, node))
+        noderBerortInn.forEach((node) => klon.set(node.id, node))
 
         if (niva > nivaaerInn) return
         klon.forEach((node) => {
-            node.incomingApp.forEach((inn) => {
-                noderBerort.set(inn.id, inn)
-            })
-            if (visKafka) {
-                node.readTopic.forEach((inn) => {
-                    noderBerort.set(inn.id, inn)
+            if (visSynkrone) {
+                node.incomingApp.forEach((inn) => {
+                    noderBerortInn.set(inn.id, inn)
                 })
             }
-            // TODO incoming for host må funke?
+            if (visKafka) {
+                node.readTopic.forEach((inn) => {
+                    noderBerortInn.set(inn.id, inn)
+                })
+            }
+            // TODO incoming for ekstern host bør funke?
         })
         parseInngaende(niva + 1)
     }
@@ -66,8 +77,15 @@ export function kalkulerNoderOgKanter(
         nodes: [],
         edges: [],
     }
+    const innOgUtNoder = new Map<string, ArkitekturNode>()
+    noderBerortInn.forEach((node) => {
+        innOgUtNoder.set(node.id, node)
+    })
+    noderBerortUt.forEach((node) => {
+        innOgUtNoder.set(node.id, node)
+    })
 
-    noderBerort.forEach((node) => {
+    innOgUtNoder.forEach((node) => {
         if (initielleSlettedeNoder.includes(node.id)) return
 
         data.nodes.push({
@@ -81,26 +99,26 @@ export function kalkulerNoderOgKanter(
             },
         })
         node.outgoingHost.forEach((out) => {
-            const outNode = noderBerort.get(out.id)
+            const outNode = innOgUtNoder.get(out.id)
             if (outNode) {
                 data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
             }
         })
         node.outgoingApp.forEach((out) => {
-            const outNode = noderBerort.get(out.id)
+            const outNode = innOgUtNoder.get(out.id)
             if (outNode) {
                 data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
             }
         })
         if (node.nodeType == 'app') {
             node.writeTopic.forEach((out) => {
-                const outNode = noderBerort.get(out.id)
+                const outNode = innOgUtNoder.get(out.id)
                 if (outNode) {
                     data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
                 }
             })
             node.readTopic.forEach((out) => {
-                const outNode = noderBerort.get(out.id)
+                const outNode = innOgUtNoder.get(out.id)
                 if (outNode) {
                     data.edges.push({ from: node.id, to: outNode.id, arrows: { from: { enabled: true } } })
                 }

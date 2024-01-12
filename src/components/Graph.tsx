@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef } from 'react'
 import { Network, Options } from 'vis-network'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
+import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
 import { Chips } from '@navikt/ds-react'
 
 import { ArkitekturNode } from '@/nodes/kalkulerNoder'
@@ -11,7 +11,6 @@ import { namespaceToAkselColor, namespaceToColor } from '@/namespace/farger'
 export function Graph({
     arkitekturNoder,
     valgteNamespaces,
-    visKafka,
     slettNoder,
     filter,
     initielleSlettedeNoder,
@@ -22,7 +21,6 @@ export function Graph({
 }: {
     arkitekturNoder: ArkitekturNode[]
     valgteNamespaces: string[]
-    visKafka: boolean
     slettNoder: boolean
     filter: string[]
     initielleSlettedeNoder: string[]
@@ -36,6 +34,10 @@ export function Graph({
     const forrigeNoder = useRef(new Set<string>())
     const forrigeEdges = useRef(new Set<string>())
     const networkRef = useRef<Network>()
+    const [visSynkroneAppKall] = useQueryState('synkroneKall', parseAsBoolean.withDefault(true))
+    const [visEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
+    const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
+
     const filtreteApper = filtrerArkitekturNoder(
         arkitekturNoder,
         valgteNamespaces,
@@ -44,7 +46,15 @@ export function Graph({
         filter,
         sokemetode,
     )
-    const data = kalkulerNoderOgKanter(filtreteApper, visKafka, initielleSlettedeNoder, nivaaerInn, nivaaerUt)
+    const data = kalkulerNoderOgKanter(
+        filtreteApper,
+        visKafka,
+        visSynkroneAppKall,
+        visEksterneKall,
+        initielleSlettedeNoder,
+        nivaaerInn,
+        nivaaerUt,
+    )
 
     useEffect(() => {
         if (container.current) {
