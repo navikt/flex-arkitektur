@@ -12,92 +12,100 @@ export function kalkulerNoderOgKanter(
     filtreteApper: ArkitekturNode[],
     visKafka: boolean,
     initielleSlettedeNoder: string[],
+    nivaaerInn: number,
+    nivaaerUt: number,
 ): NoderOgKanter {
+    const noderBerort = new Map<string, ArkitekturNode>()
+
+    filtreteApper.forEach((node) => noderBerort.set(node.id, node))
+
+    function parseUtgaende(niva: number): void {
+        //klone noderberort map
+        const klon = new Map<string, ArkitekturNode>()
+        noderBerort.forEach((node) => klon.set(node.id, node))
+
+        if (niva > nivaaerUt) return
+        klon.forEach((node) => {
+            node.outgoingApp.forEach((out) => {
+                noderBerort.set(out.id, out)
+            })
+            node.outgoingHost.forEach((out) => {
+                noderBerort.set(out.id, out)
+            })
+            if (visKafka) {
+                node.writeTopic.forEach((out) => {
+                    noderBerort.set(out.id, out)
+                })
+            }
+        })
+        parseUtgaende(niva + 1)
+    }
+
+    function parseInngaende(niva: number): void {
+        const klon = new Map<string, ArkitekturNode>()
+        noderBerort.forEach((node) => klon.set(node.id, node))
+
+        if (niva > nivaaerInn) return
+        klon.forEach((node) => {
+            node.incomingApp.forEach((inn) => {
+                noderBerort.set(inn.id, inn)
+            })
+            if (visKafka) {
+                node.readTopic.forEach((inn) => {
+                    noderBerort.set(inn.id, inn)
+                })
+            }
+            // TODO incoming for host må funke?
+        })
+        parseInngaende(niva + 1)
+    }
+
+    parseUtgaende(1)
+    parseInngaende(1)
     const data: NoderOgKanter = {
         nodes: [],
         edges: [],
     }
-    filtreteApper
-        .map((app) => {
-            return {
-                id: app.id,
-                label: `${namespaceToEmoji(app.namespace || '')} ${app.navn}`,
-                shape: 'box',
-                group: app.namespace,
-                font: {
-                    face: 'monospace',
-                    align: 'left',
-                },
+
+    noderBerort.forEach((node) => {
+        if (initielleSlettedeNoder.includes(node.id)) return
+
+        data.nodes.push({
+            id: node.id,
+            label: `${namespaceToEmoji(node.namespace || '')} ${node.navn}`,
+            shape: 'box',
+            group: node.namespace,
+            font: {
+                face: 'monospace',
+                align: 'left',
+            },
+        })
+        node.outgoingHost.forEach((out) => {
+            const outNode = noderBerort.get(out.id)
+            if (outNode) {
+                data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
             }
         })
-        .forEach((node) => data.nodes?.push(node))
-
-    if (visKafka) {
-        filtreteApper
-            .filter((ap) => {
-                return ap.nodeType == 'app'
-            })
-            .forEach((app) => {
-                function parseKafka(topic: ArkitekturNode, vei: 'read' | 'write' | 'readwrite'): void {
-                    if (initielleSlettedeNoder.includes(topic.id)) return
-                    if (!data.nodes.find((node) => node.id === topic.id)) {
-                        data.nodes.push({
-                            id: topic.id,
-                            label: namespaceToEmoji(topic.namespace || '') + ' ' + topic.navn,
-                            shape: 'box',
-                            group: topic.namespace,
-                            font: {
-                                face: 'monospace',
-                                align: 'left',
-                            },
-                        })
-                    }
-                    data.edges.push({
-                        from: topic.id,
-                        to: app.id,
-                        dashes: true,
-                        arrows: {
-                            to: { enabled: vei == 'read' || vei == 'readwrite' },
-                            from: { enabled: vei == 'write' || vei == 'readwrite' },
-                        },
-                    })
+        node.outgoingApp.forEach((out) => {
+            const outNode = noderBerort.get(out.id)
+            if (outNode) {
+                data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
+            }
+        })
+        if (node.nodeType == 'app') {
+            node.writeTopic.forEach((out) => {
+                const outNode = noderBerort.get(out.id)
+                if (outNode) {
+                    data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
                 }
-
-                app.writeTopic?.forEach((t) => {
-                    if (app.readTopic.has(t)) {
-                        parseKafka(t, 'readwrite')
-                    } else {
-                        parseKafka(t, 'write')
-                    }
-                })
-                app.readTopic?.forEach((t) => {
-                    if (app.writeTopic.has(t)) return
-                    parseKafka(t, 'read')
-                })
             })
-    }
-
-    filtreteApper.forEach((app) => {
-        app.outgoingHost?.forEach((outHost) => {
-            if (!data.nodes.find((node) => node.id === outHost.id)) {
-                data.nodes.push({
-                    id: outHost.id,
-                    label: outHost.id,
-                    shape: 'box',
-                    group: 'ekstern',
-                    font: {
-                        face: 'monospace',
-                        align: 'left',
-                    },
-                })
-            }
-            data.edges.push({ from: app.id, to: outHost.id, arrows: { to: { enabled: true } } })
-        })
-    })
-    filtreteApper.forEach((app) => {
-        app.outgoingApp?.forEach((outboundApp) => {
-            data.edges.push({ from: app.id, to: outboundApp.id, arrows: { to: { enabled: true } } })
-        })
+            node.readTopic.forEach((out) => {
+                const outNode = noderBerort.get(out.id)
+                if (outNode) {
+                    data.edges.push({ from: node.id, to: outNode.id, arrows: { from: { enabled: true } } })
+                }
+            })
+        }
     })
     return data
 }

@@ -1,6 +1,5 @@
 import React, { ReactElement, useEffect, useRef } from 'react'
 import { Network, Options } from 'vis-network'
-import { logger } from '@navikt/next-logger'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'next-usequerystate'
 import { Chips } from '@navikt/ds-react'
 
@@ -18,6 +17,8 @@ export function Graph({
     initielleSlettedeNoder,
     sokemetode,
     valgeApper,
+    nivaaerUt,
+    nivaaerInn,
 }: {
     arkitekturNoder: ArkitekturNode[]
     valgteNamespaces: string[]
@@ -27,7 +28,8 @@ export function Graph({
     initielleSlettedeNoder: string[]
     sokemetode: string
     valgeApper: string[]
-    nivaaer: number
+    nivaaerUt: number
+    nivaaerInn: number
 }): ReactElement {
     const container = useRef(null)
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
@@ -42,7 +44,7 @@ export function Graph({
         filter,
         sokemetode,
     )
-    const data = kalkulerNoderOgKanter(filtreteApper, visKafka, initielleSlettedeNoder)
+    const data = kalkulerNoderOgKanter(filtreteApper, visKafka, initielleSlettedeNoder, nivaaerInn, nivaaerUt)
 
     useEffect(() => {
         if (container.current) {
@@ -52,7 +54,6 @@ export function Graph({
             if (areSetsEqual(nyeNoder, forrigeNoder.current) && areSetsEqual(nyeKanter, forrigeEdges.current)) {
                 return
             }
-            logger.info('Rerendrer graf')
             forrigeNoder.current = nyeNoder
             forrigeEdges.current = nyeKanter
             const grupper = new Set<string>()

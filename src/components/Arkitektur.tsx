@@ -18,7 +18,8 @@ export const Arkitektur = (): ReactElement => {
     const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('namespace'))
 
     const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
-    const [nivaaer, setNivaaer] = useQueryState('nivaaer', parseAsInteger.withDefault(0))
+    const [nivaaerUt, setNivaaerUt] = useQueryState('nivaaerUt', parseAsInteger.withDefault(0))
+    const [nivaaerInn, setNivaaerInn] = useQueryState('nivaaerInn', parseAsInteger.withDefault(0))
     const [slettNoder, setSlettNoder] = useState(false)
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [filterTekst, setFilterTekst] = useState(filter.join(' '))
@@ -77,6 +78,7 @@ export const Arkitektur = (): ReactElement => {
     }, [data])
 
     const alleNamespaces = Array.from(new Set(data?.map((app) => app.namespace))).sort()
+
     const trie = useMemo(() => {
         const minTrie = new Trie()
         arkitekturNoder.forEach((app) => {
@@ -161,10 +163,24 @@ export const Arkitektur = (): ReactElement => {
                     )}
 
                     <Select
-                        label="Nivåer"
-                        value={nivaaer + ''}
+                        label="Nivåer ut"
+                        value={nivaaerUt + ''}
                         onChange={(e) => {
-                            setNivaaer(Number(e.target.value))
+                            setNivaaerUt(Number(e.target.value))
+                        }}
+                    >
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="5">4</option>
+                        <option value="6">5</option>
+                    </Select>
+                    <Select
+                        label="Nivåer inn"
+                        value={nivaaerInn + ''}
+                        onChange={(e) => {
+                            setNivaaerInn(Number(e.target.value))
                         }}
                     >
                         <option value="0">0</option>
@@ -229,7 +245,8 @@ export const Arkitektur = (): ReactElement => {
                     visKafka={visKafka}
                     slettNoder={slettNoder}
                     filter={filter}
-                    nivaaer={nivaaer}
+                    nivaaerUt={nivaaerUt}
+                    nivaaerInn={nivaaerInn}
                     initielleSlettedeNoder={initielleSlettedeNoder.current}
                 />
             )}

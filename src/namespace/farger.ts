@@ -24,8 +24,6 @@ export function namespaceToAkselColor(namespace: string): string {
             return farger[5]
         case 'helsearbeidsgiver':
             return farger[6]
-        case 'personbruker':
-            return farger[7]
         default:
             return randomColorFromHash(namespace)
     }
