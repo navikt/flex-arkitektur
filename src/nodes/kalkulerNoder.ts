@@ -8,6 +8,7 @@ export class ArkitekturNode {
     public writeTopic = new Set<ArkitekturNode>()
     public readTopic = new Set<ArkitekturNode>()
     public outgoingHost = new Set<ArkitekturNode>()
+    public incomingHost = new Set<ArkitekturNode>()
 
     constructor(
         public id: string,
@@ -52,6 +53,7 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
             }
 
             appArkitekturnode.outgoingHost.add(outHost)
+            outHost.incomingHost.add(appArkitekturnode)
         })
     })
     data.forEach((app) => {

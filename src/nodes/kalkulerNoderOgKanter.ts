@@ -61,12 +61,16 @@ export function kalkulerNoderOgKanter(
                     noderBerortInn.set(inn.id, inn)
                 })
             }
+            if (visEksterne) {
+                node.incomingHost.forEach((inn) => {
+                    noderBerortInn.set(inn.id, inn)
+                })
+            }
             if (visKafka) {
                 node.readTopic.forEach((inn) => {
                     noderBerortInn.set(inn.id, inn)
                 })
             }
-            // TODO incoming for ekstern host bør funke?
         })
         parseInngaende(niva + 1)
     }
