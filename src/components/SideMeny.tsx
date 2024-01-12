@@ -27,9 +27,12 @@ export function SideMeny({
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [, setFilterTekst] = useState(filter.join(' '))
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
+    const [brukFysikk, setBrukFysikk] = useQueryState('fysikk', parseAsBoolean.withDefault(true))
+
     return (
         <Modal
             open={openState}
+            closeOnBackdropClick={true}
             onClose={() => {
                 setOpenState(false)
             }}
@@ -76,6 +79,9 @@ export function SideMeny({
                     </Switch>
                     <Switch checked={visEksterneKall} onChange={() => setVisEksterneKall(!visEksterneKall)}>
                         Eksterne synkrone avhengigheter
+                    </Switch>
+                    <Switch checked={brukFysikk} onChange={() => setBrukFysikk(!brukFysikk)}>
+                        Fysikk i visualisering
                     </Switch>
                     <Switch checked={slettNoder} onChange={() => setSlettNoder(!slettNoder)}>
                         Slett

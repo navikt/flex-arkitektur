@@ -37,6 +37,8 @@ export function Graph({
     const [visSynkroneAppKall] = useQueryState('synkroneKall', parseAsBoolean.withDefault(true))
     const [visEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
     const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
+    const [brukFysikk] = useQueryState('fysikk', parseAsBoolean.withDefault(true))
+    const forrigeFysikk = useRef(brukFysikk)
 
     const filtreteApper = filtrerArkitekturNoder(
         arkitekturNoder,
@@ -61,11 +63,16 @@ export function Graph({
             const nyeNoder = new Set(data.nodes.map((node) => node.id as string))
             const nyeKanter = new Set(data.edges.map((edge) => edge.id as string))
 
-            if (areSetsEqual(nyeNoder, forrigeNoder.current) && areSetsEqual(nyeKanter, forrigeEdges.current)) {
+            if (
+                areSetsEqual(nyeNoder, forrigeNoder.current) &&
+                areSetsEqual(nyeKanter, forrigeEdges.current) &&
+                forrigeFysikk.current === brukFysikk
+            ) {
                 return
             }
             forrigeNoder.current = nyeNoder
             forrigeEdges.current = nyeKanter
+            forrigeFysikk.current = brukFysikk
             const grupper = new Set<string>()
             data.nodes.forEach((node) => {
                 if (node.group === undefined) return
@@ -78,6 +85,7 @@ export function Graph({
                     },
                 },
                 physics: {
+                    enabled: brukFysikk,
                     solver: 'forceAtlas2Based',
                 },
             }
@@ -93,7 +101,7 @@ export function Graph({
             })
             networkRef.current = new Network(container.current, data, options)
         }
-    }, [data])
+    }, [data, brukFysikk])
 
     useEffect(() => {
         if (networkRef.current) {
