@@ -48,6 +48,7 @@ export function kalkulerNoderOgKanter(
         })
         parseUtgaende(niva + 1)
     }
+
     const noderBerortInn = new Map<string, ArkitekturNode>()
 
     filtreteApper.forEach((node) => noderBerortInn.set(node.id, node))
@@ -123,10 +124,17 @@ export function kalkulerNoderOgKanter(
             node.blirLestAvApp.forEach((out) => {
                 const outNode = innOgUtNoder.get(out.id)
                 if (outNode) {
-                    data.edges.push({ dashes: true, from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
+                    const readwrite = node.blirSkrevetTilAvApp.has(out)
+                    data.edges.push({
+                        dashes: true,
+                        from: node.id,
+                        to: outNode.id,
+                        arrows: { to: { enabled: true }, from: { enabled: readwrite } },
+                    })
                 }
             })
             node.blirSkrevetTilAvApp.forEach((out) => {
+                if (node.blirLestAvApp.has(out)) return
                 const outNode = innOgUtNoder.get(out.id)
                 if (outNode) {
                     data.edges.push({
