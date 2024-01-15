@@ -97,17 +97,54 @@ export function kalkulerNoderOgKanter(
 
     innOgUtNoder.forEach((node) => {
         if (initielleSlettedeNoder.includes(node.id)) return
-
-        data.nodes.push({
-            id: node.id,
-            label: `${namespaceToEmoji(node.namespace || '')} ${node.navn}`,
-            shape: 'box',
-            group: node.namespace,
-            font: {
-                face: 'monospace',
-                align: 'left',
-            },
-        })
+        if (node.nodeType == 'app') {
+            data.nodes.push({
+                id: node.id,
+                label: `${namespaceToEmoji(node.namespace || '')} ${node.navn} \n\n  applikasjon`,
+                shape: 'box',
+                margin: {
+                    top: 20,
+                    bottom: 20,
+                    left: 10,
+                    right: 10,
+                },
+                group: node.namespace,
+                font: {
+                    face: 'monospace',
+                    align: 'center',
+                },
+            })
+        }
+        if (node.nodeType == 'topic') {
+            data.nodes.push({
+                id: node.id,
+                label: `${namespaceToEmoji(node.namespace || '')} ${node.navn} \n kafka topic`,
+                shape: 'box',
+                margin: {
+                    top: 10,
+                    bottom: 10,
+                    left: 10,
+                    right: 10,
+                },
+                group: node.namespace,
+                font: {
+                    face: 'monospace',
+                    align: 'center',
+                },
+            })
+        }
+        if (node.nodeType == 'ekstern') {
+            data.nodes.push({
+                id: node.id,
+                label: `${namespaceToEmoji(node.namespace || '')} ${node.navn}`,
+                shape: 'triangle',
+                group: node.namespace,
+                font: {
+                    face: 'monospace',
+                    align: 'left',
+                },
+            })
+        }
         node.outgoingHost.forEach((out) => {
             const outNode = innOgUtNoder.get(out.id)
             if (outNode && visEksterne) {

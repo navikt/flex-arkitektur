@@ -86,7 +86,23 @@ export function Graph({
                 },
                 physics: {
                     enabled: brukFysikk,
-                    solver: 'forceAtlas2Based',
+                    barnesHut: {
+                        gravitationalConstant: -30000,
+                        centralGravity: 0.3,
+                        springLength: 110,
+                        springConstant: 0.04,
+                        damping: 0.09,
+                        avoidOverlap: 0,
+                    },
+                    maxVelocity: 50,
+                    minVelocity: 0.1,
+                    solver: 'barnesHut',
+                    timestep: 0.5,
+                    stabilization: {
+                        enabled: true,
+                        iterations: 1000,
+                        updateInterval: 25,
+                    },
                 },
             }
             Array.from(grupper).forEach((gruppe) => {
