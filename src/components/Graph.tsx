@@ -107,14 +107,15 @@ export function Graph({
         if (networkRef.current) {
             if (slettNoder) {
                 networkRef.current.on('click', function (params) {
-                    if (params.nodes.length == 0) return
-                    try {
-                        setSlettedeNoder((slettedeNoder) => [...slettedeNoder, params.nodes[0]])
-                        networkRef.current?.selectNodes(params.nodes)
-                        networkRef.current?.deleteSelected()
-                        networkRef.current?.selectNodes([])
-                    } catch (e) {
-                        //TODO noe skjer, men det funker logger.error(e)
+                    if (params.nodes.length > 0) {
+                        try {
+                            setSlettedeNoder((slettedeNoder) => [...slettedeNoder, params.nodes[0]])
+                            networkRef.current?.selectNodes(params.nodes)
+                            networkRef.current?.deleteSelected()
+                            networkRef.current?.selectNodes([])
+                        } catch (e) {
+                            //TODO noe skjer, men det funker logger.error(e)
+                        }
                     }
                 })
             } else {

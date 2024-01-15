@@ -111,13 +111,23 @@ export function kalkulerNoderOgKanter(
         node.outgoingHost.forEach((out) => {
             const outNode = innOgUtNoder.get(out.id)
             if (outNode && visEksterne) {
-                data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
+                data.edges.push({
+                    id: `${node.id}-${outNode.id}`,
+                    from: node.id,
+                    to: outNode.id,
+                    arrows: { to: { enabled: true } },
+                })
             }
         })
         node.outgoingApp.forEach((out) => {
             const outNode = innOgUtNoder.get(out.id)
             if (outNode && visSynkrone) {
-                data.edges.push({ from: node.id, to: outNode.id, arrows: { to: { enabled: true } } })
+                data.edges.push({
+                    id: `${node.id}-${outNode.id}`,
+                    from: node.id,
+                    to: outNode.id,
+                    arrows: { to: { enabled: true } },
+                })
             }
         })
         if (node.nodeType == 'topic') {
@@ -126,6 +136,7 @@ export function kalkulerNoderOgKanter(
                 if (outNode) {
                     const readwrite = node.blirSkrevetTilAvApp.has(out)
                     data.edges.push({
+                        id: `${node.id}-${outNode.id}`,
                         dashes: true,
                         from: node.id,
                         to: outNode.id,
@@ -138,6 +149,7 @@ export function kalkulerNoderOgKanter(
                 const outNode = innOgUtNoder.get(out.id)
                 if (outNode) {
                     data.edges.push({
+                        id: `${node.id}-${outNode.id}`,
                         dashes: true,
                         from: node.id,
                         to: outNode.id,

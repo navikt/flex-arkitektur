@@ -14,7 +14,6 @@ interface SideMenyProps {
 export function SideMeny({
     openState,
     setOpenState,
-    slettNoder,
     setSlettNoder,
     setNamespaces,
     setApper,
@@ -83,9 +82,15 @@ export function SideMeny({
                     <Switch checked={brukFysikk} onChange={() => setBrukFysikk(!brukFysikk)}>
                         Fysikk i visualisering
                     </Switch>
-                    <Switch checked={slettNoder} onChange={() => setSlettNoder(!slettNoder)}>
-                        Slett
-                    </Switch>
+                    <Button
+                        variant="danger"
+                        onClick={() => {
+                            setSlettNoder(true)
+                            setOpenState(false)
+                        }}
+                    >
+                        Slett noder og kanter
+                    </Button>
                 </div>
             </Modal.Body>
         </Modal>

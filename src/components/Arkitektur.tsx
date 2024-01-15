@@ -259,6 +259,20 @@ export const Arkitektur = (): ReactElement => {
                 setNamespaces={setNamespaces}
                 setApper={setApper}
             ></SideMeny>
+            {slettNoder && (
+                <div className="fixed bottom-10 left-0 m-10 bg-gray-100 p-5 rounded">
+                    <Alert variant="error">Klikk på noder og kanter du vil fjerne fra visualiseringen.</Alert>
+                    <Button
+                        className="mt-2"
+                        variant="primary"
+                        onClick={() => {
+                            setSlettNoder(false)
+                        }}
+                    >
+                        Ferdig
+                    </Button>
+                </div>
+            )}
         </>
     )
 }
