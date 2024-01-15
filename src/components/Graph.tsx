@@ -117,6 +117,15 @@ export function Graph({
                             //TODO noe skjer, men det funker logger.error(e)
                         }
                     }
+                    if (params.edges.length > 0) {
+                        try {
+                            networkRef.current?.selectEdges(params.edges)
+                            networkRef.current?.deleteSelected()
+                            networkRef.current?.selectEdges([])
+                        } catch (e) {
+                            //TODO noe skjer, men det funker logger.error(e)
+                        }
+                    }
                 })
             } else {
                 networkRef.current.off('click')
