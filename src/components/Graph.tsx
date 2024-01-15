@@ -94,14 +94,14 @@ export function Graph({
                         damping: 0.09,
                         avoidOverlap: 0,
                     },
-                    maxVelocity: 50,
-                    minVelocity: 0.1,
+                    maxVelocity: 30,
+                    minVelocity: 3,
                     solver: 'barnesHut',
                     timestep: 0.5,
                     stabilization: {
                         enabled: true,
-                        iterations: 1000,
-                        updateInterval: 25,
+                        iterations: 100,
+                        updateInterval: 50,
                     },
                 },
             }
