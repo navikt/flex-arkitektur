@@ -22,7 +22,7 @@
         "@navikt/aksel-icons": "^5.12.4",
         "@navikt/ds-css": "^5.15.0",
         "@navikt/ds-react": "^5.15.0",
-        "@navikt/ds-tailwind": "^5.13.0",
+        "@navikt/ds-tailwind": "^5.15.0",
         "@navikt/ds-tokens": "^5.12.5",
         "@navikt/next-auth-wonderwall": "^1.5.0",
         "@navikt/next-logger": "^1.21.0",
