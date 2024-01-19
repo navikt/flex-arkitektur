@@ -14,7 +14,7 @@ export class ArkitekturNode {
     public blirSkrevetTilAvApp = new Set<ArkitekturNode>()
     public harDatabase = new Set<ArkitekturNode>()
     public erDatabaseSomBlirBruktAv = new Set<ArkitekturNode>()
-
+    public ingresser = new Set<string>()
     constructor(
         public id: string,
         public navn: string,
@@ -34,6 +34,7 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
             if (ingress.endsWith('/')) {
                 ingress = ingress.slice(0, -1)
             }
+            arkitekturNode.ingresser.add(ingress)
 
             ingessMap.set(ingress, arkitekturNode)
         })

@@ -32,6 +32,7 @@ export function SideMeny({
     const [visSynkroneAppKall, setVisSynkroneAppKall] = useQueryState('synkroneKall', parseAsBoolean.withDefault(true))
     const [visEksterneKall, setVisEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
     const [visDatabase, setVisDatabase] = useQueryState('database', parseAsBoolean.withDefault(true))
+    const [visIngresser, setVisIngresser] = useQueryState('ingresser', parseAsBoolean.withDefault(true))
 
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [, setFilterTekst] = useState(filter.join(' '))
@@ -81,6 +82,9 @@ export function SideMeny({
                     </div>
                     <Switch checked={visEmoji} onChange={() => setVisEmoji(!visEmoji)}>
                         Vis team emoji 😊
+                    </Switch>
+                    <Switch checked={visIngresser} onChange={() => setVisIngresser(!visIngresser)}>
+                        Vis ingresser
                     </Switch>
                     <Switch checked={visKafka} onChange={() => setVisKafka(!visKafka)}>
                         Kafka avhengigheter

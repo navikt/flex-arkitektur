@@ -43,6 +43,8 @@ export function Graph({
     const [visEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
     const [visDatabase] = useQueryState('database', parseAsBoolean.withDefault(true))
     const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
+    const [visIngresser] = useQueryState('ingresser', parseAsBoolean.withDefault(true))
+    const forrigeIngresser = useRef(visIngresser)
 
     const filtrerteNoder = filtrerArkitekturNoder(
         arkitekturNoder,
@@ -62,6 +64,7 @@ export function Graph({
         nivaaerInn,
         nivaaerUt,
         emoji,
+        visIngresser,
     })
     const nettverkErRendret = useRef(false)
 
@@ -81,7 +84,8 @@ export function Graph({
             if (
                 areSetsEqual(nyeNoder, forrigeNoder.current) &&
                 areSetsEqual(nyeKanter, forrigeEdges.current) &&
-                forrigeEmoji.current === emoji
+                forrigeEmoji.current === emoji &&
+                forrigeIngresser.current === visIngresser
             ) {
                 return
             }
@@ -139,7 +143,7 @@ export function Graph({
                 nettverkErRendret.current = true
             }, 20)
         }
-    }, [data, brukFysikk, emoji])
+    }, [visIngresser, data, brukFysikk, emoji])
 
     useEffect(() => {
         if (networkRef.current) {

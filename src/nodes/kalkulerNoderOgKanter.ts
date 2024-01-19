@@ -18,6 +18,7 @@ interface KalkulasjonOptions {
     nivaaerInn: number
     nivaaerUt: number
     emoji: boolean
+    visIngresser: boolean
 }
 
 export function kalkulerNoderOgKanter({
@@ -30,6 +31,7 @@ export function kalkulerNoderOgKanter({
     nivaaerInn,
     nivaaerUt,
     emoji,
+    visIngresser,
 }: KalkulasjonOptions): NoderOgKanter {
     const noderBerortUt = new Map<string, ArkitekturNode>()
 
@@ -122,9 +124,13 @@ export function kalkulerNoderOgKanter({
     innOgUtNoder.forEach((node) => {
         if (initielleSlettedeNoder.includes(node.id)) return
         if (node.nodeType == 'app') {
+            let label = `${namespaceToEmoji(emoji, node.namespace)} ${node.navn} \n\n  applikasjon`
+            if (visIngresser) {
+                label += '\n\n' + Array.from(node.ingresser).join('\n')
+            }
             data.nodes.push({
                 id: node.id,
-                label: `${namespaceToEmoji(emoji, node.namespace)} ${node.navn} \n\n  applikasjon`,
+                label: label,
                 shape: 'box',
                 margin: {
                     top: 20,
