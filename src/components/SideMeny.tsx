@@ -23,6 +23,8 @@ export function SideMeny({
     const [visKafka, setVisKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
     const [visSynkroneAppKall, setVisSynkroneAppKall] = useQueryState('synkroneKall', parseAsBoolean.withDefault(true))
     const [visEksterneKall, setVisEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
+    const [visDatabase, setVisDatabase] = useQueryState('database', parseAsBoolean.withDefault(true))
+
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [, setFilterTekst] = useState(filter.join(' '))
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
@@ -78,6 +80,13 @@ export function SideMeny({
                     </Switch>
                     <Switch checked={visEksterneKall} onChange={() => setVisEksterneKall(!visEksterneKall)}>
                         Eksterne synkrone avhengigheter
+                    </Switch>
+                    <Switch
+                        description="Fungerer bare for databaser som er hardkodet inn"
+                        checked={visDatabase}
+                        onChange={() => setVisDatabase(!visDatabase)}
+                    >
+                        Databaser
                     </Switch>
                     <Switch checked={brukFysikk} onChange={() => setBrukFysikk(!brukFysikk)}>
                         Fysikk i visualisering
