@@ -8,18 +8,30 @@ interface NoderOgKanter {
     edges: Edge[]
 }
 
-export function kalkulerNoderOgKanter(
-    filtreteApper: ArkitekturNode[],
-    visKafka: boolean,
-    visSynkrone: boolean,
-    visEksterne: boolean,
-    initielleSlettedeNoder: string[],
-    nivaaerInn: number,
-    nivaaerUt: number,
-): NoderOgKanter {
+interface KalkulasjonOptions {
+    filtrerteNoder: ArkitekturNode[]
+    visKafka: boolean
+    visSynkroneAppKall: boolean
+    visEksterneKall: boolean
+    visDatabase: boolean
+    initielleSlettedeNoder: string[]
+    nivaaerInn: number
+    nivaaerUt: number
+}
+
+export function kalkulerNoderOgKanter({
+    filtrerteNoder,
+    visKafka,
+    visSynkroneAppKall,
+    visEksterneKall,
+    visDatabase,
+    initielleSlettedeNoder,
+    nivaaerInn,
+    nivaaerUt,
+}: KalkulasjonOptions): NoderOgKanter {
     const noderBerortUt = new Map<string, ArkitekturNode>()
 
-    filtreteApper.forEach((node) => noderBerortUt.set(node.id, node))
+    filtrerteNoder.forEach((node) => noderBerortUt.set(node.id, node))
 
     function parseUtgaende(niva: number): void {
         const klon = new Map<string, ArkitekturNode>()
@@ -27,13 +39,18 @@ export function kalkulerNoderOgKanter(
 
         if (niva > nivaaerUt) return
         klon.forEach((node) => {
-            if (visSynkrone) {
+            if (visSynkroneAppKall) {
                 node.outgoingApp.forEach((out) => {
                     noderBerortUt.set(out.id, out)
                 })
             }
-            if (visEksterne) {
+            if (visEksterneKall) {
                 node.outgoingHost.forEach((out) => {
+                    noderBerortUt.set(out.id, out)
+                })
+            }
+            if (visDatabase) {
+                node.harDatabase.forEach((out) => {
                     noderBerortUt.set(out.id, out)
                 })
             }
@@ -51,7 +68,7 @@ export function kalkulerNoderOgKanter(
 
     const noderBerortInn = new Map<string, ArkitekturNode>()
 
-    filtreteApper.forEach((node) => noderBerortInn.set(node.id, node))
+    filtrerteNoder.forEach((node) => noderBerortInn.set(node.id, node))
 
     function parseInngaende(niva: number): void {
         const klon = new Map<string, ArkitekturNode>()
@@ -59,13 +76,18 @@ export function kalkulerNoderOgKanter(
 
         if (niva > nivaaerInn) return
         klon.forEach((node) => {
-            if (visSynkrone) {
+            if (visSynkroneAppKall) {
                 node.incomingApp.forEach((inn) => {
                     noderBerortInn.set(inn.id, inn)
                 })
             }
-            if (visEksterne) {
+            if (visEksterneKall) {
                 node.blirKalltAvApp.forEach((inn) => {
+                    noderBerortInn.set(inn.id, inn)
+                })
+            }
+            if (visDatabase) {
+                node.erDatabaseSomBlirBruktAv.forEach((inn) => {
                     noderBerortInn.set(inn.id, inn)
                 })
             }
@@ -145,9 +167,34 @@ export function kalkulerNoderOgKanter(
                 },
             })
         }
+        if (node.nodeType == 'database') {
+            data.nodes.push({
+                id: node.id,
+                label: `${node.navn}\ndatabase`,
+                shape: 'hexagon',
+                icon: { code: '\uf1c0' },
+                group: node.namespace,
+                font: {
+                    face: 'monospace',
+                    align: 'center',
+                    color: 'black',
+                },
+            })
+        }
         node.outgoingHost.forEach((out) => {
             const outNode = innOgUtNoder.get(out.id)
-            if (outNode && visEksterne) {
+            if (outNode && visEksterneKall) {
+                data.edges.push({
+                    id: `${node.id}-${outNode.id}`,
+                    from: node.id,
+                    to: outNode.id,
+                    arrows: { to: { enabled: true } },
+                })
+            }
+        })
+        node.harDatabase.forEach((out) => {
+            const outNode = innOgUtNoder.get(out.id)
+            if (outNode && visDatabase) {
                 data.edges.push({
                     id: `${node.id}-${outNode.id}`,
                     from: node.id,
@@ -158,7 +205,7 @@ export function kalkulerNoderOgKanter(
         })
         node.outgoingApp.forEach((out) => {
             const outNode = innOgUtNoder.get(out.id)
-            if (outNode && visSynkrone) {
+            if (outNode && visSynkroneAppKall) {
                 data.edges.push({
                     id: `${node.id}-${outNode.id}`,
                     from: node.id,

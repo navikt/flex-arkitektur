@@ -36,11 +36,12 @@ export function Graph({
     const networkRef = useRef<Network>()
     const [visSynkroneAppKall] = useQueryState('synkroneKall', parseAsBoolean.withDefault(true))
     const [visEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
+    const [visDatabase] = useQueryState('database', parseAsBoolean.withDefault(true))
     const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
     const [brukFysikk] = useQueryState('fysikk', parseAsBoolean.withDefault(true))
     const forrigeFysikk = useRef(brukFysikk)
 
-    const filtreteApper = filtrerArkitekturNoder(
+    const filtrerteNoder = filtrerArkitekturNoder(
         arkitekturNoder,
         valgteNamespaces,
         valgeApper,
@@ -48,15 +49,16 @@ export function Graph({
         filter,
         sokemetode,
     )
-    const data = kalkulerNoderOgKanter(
-        filtreteApper,
+    const data = kalkulerNoderOgKanter({
+        filtrerteNoder,
         visKafka,
         visSynkroneAppKall,
         visEksterneKall,
         initielleSlettedeNoder,
+        visDatabase,
         nivaaerInn,
         nivaaerUt,
-    )
+    })
 
     useEffect(() => {
         if (container.current) {

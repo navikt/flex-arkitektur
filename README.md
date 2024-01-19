@@ -25,6 +25,15 @@ Kjør deretter `npm run dev` for å starte opp applikasjonen.
 
 Kjør `npm run local` for å starte opp applikasjonen med lokal testdata.
 
+## Legge inn databaser
+
+Databaser ligger ikke i dataproduktet per 19. januar 2024. Man kan manuelt legge det til for enkelte namespace.
+Kjør denne kommandoen for å hente for et namespace:
+
+`kubectl get app -n flex -o json | jq '[.items[] | {appName: .metadata.name, namespace: .metadata.namespace, databases: [(.spec.gcp?.sqlInstances[]?.databases[]? | .name)]} | select(.databases | length > 0)] | sort_by(.appName)'`
+
+Oppdater deretter `database.ts` med det som kommer ut av denne kommandoen.
+
 # Henvendelser
 
 Spørsmål knyttet til koden eller prosjektet kan stilles til flex@nav.no

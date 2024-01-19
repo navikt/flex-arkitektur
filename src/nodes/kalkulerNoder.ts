@@ -1,6 +1,7 @@
 import { NaisApp } from '@/types'
+import { databaser } from '@/databaser/databaser'
 
-export type NodeType = 'app' | 'topic' | 'ekstern'
+export type NodeType = 'app' | 'topic' | 'ekstern' | 'database'
 
 export class ArkitekturNode {
     public outgoingApp = new Set<ArkitekturNode>()
@@ -11,6 +12,8 @@ export class ArkitekturNode {
     public blirKalltAvApp = new Set<ArkitekturNode>()
     public blirLestAvApp = new Set<ArkitekturNode>()
     public blirSkrevetTilAvApp = new Set<ArkitekturNode>()
+    public harDatabase = new Set<ArkitekturNode>()
+    public erDatabaseSomBlirBruktAv = new Set<ArkitekturNode>()
 
     constructor(
         public id: string,
@@ -92,6 +95,37 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
             if (topicet) {
                 nodeMap.get(name(app))?.readTopic.add(topicet)
                 topicet.blirLestAvApp.add(nodeMap.get(name(app)) as ArkitekturNode)
+            }
+        })
+    })
+    databaser.forEach((app) => {
+        app.databases.forEach((database) => {
+            const id = app.namespace + '.' + app.appName + '.' + database
+            const databaseNode = new ArkitekturNode(id, database, app.namespace, 'database')
+            nodeMap.set(id, databaseNode)
+        })
+    })
+
+    databaser.forEach((app) => {
+        app.databases.forEach((database) => {
+            const id = app.namespace + '.' + app.appName + '.' + database
+            const databaseNode = nodeMap.get(id)!
+
+            function finnApp(): ArkitekturNode | undefined {
+                const prod = nodeMap.get('prod-gcp' + '.' + app.namespace + '.' + app.appName)
+                if (prod) {
+                    return prod
+                }
+                const dev = nodeMap.get('prod-gcp' + '.' + app.namespace + '.' + app.appName)
+                if (dev) {
+                    return dev
+                }
+                return undefined
+            }
+            const appen = finnApp()
+            if (appen) {
+                databaseNode.erDatabaseSomBlirBruktAv.add(appen)
+                appen.harDatabase.add(databaseNode)
             }
         })
     })
