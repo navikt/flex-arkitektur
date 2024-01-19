@@ -1,4 +1,4 @@
-import { Button, Modal, Select, Switch } from '@navikt/ds-react'
+import { Button, Modal, Radio, RadioGroup, Select, Switch } from '@navikt/ds-react'
 import React, { useState } from 'react'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
 
@@ -33,6 +33,7 @@ export function SideMeny({
     const [visEksterneKall, setVisEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
     const [visDatabase, setVisDatabase] = useQueryState('database', parseAsBoolean.withDefault(true))
     const [visIngresser, setVisIngresser] = useQueryState('ingresser', parseAsBoolean.withDefault(true))
+    const [fysikk, setFysikk] = useQueryState('fysikk', parseAsString.withDefault('barnesHut'))
 
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [, setFilterTekst] = useState(filter.join(' '))
@@ -102,6 +103,10 @@ export function SideMeny({
                     >
                         Databaser
                     </Switch>
+                    <RadioGroup size="small" legend="Fysikk" onChange={(val: string) => setFysikk(val)} value={fysikk}>
+                        <Radio value="barnesHut">Barnes Hut</Radio>
+                        <Radio value="forceAtlas2Based">Atlas 2</Radio>
+                    </RadioGroup>
                     <Switch checked={brukFysikk} onChange={() => setBrukFysikk(!brukFysikk)}>
                         Automatisk organisering av noder
                     </Switch>

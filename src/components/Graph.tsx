@@ -45,6 +45,8 @@ export function Graph({
     const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
     const [visIngresser] = useQueryState('ingresser', parseAsBoolean.withDefault(true))
     const forrigeIngresser = useRef(visIngresser)
+    const [fysikk] = useQueryState('fysikk', parseAsString.withDefault('barnesHut'))
+    const forrigeFysikk = useRef(fysikk)
 
     const filtrerteNoder = filtrerArkitekturNoder(
         arkitekturNoder,
@@ -85,7 +87,8 @@ export function Graph({
                 areSetsEqual(nyeNoder, forrigeNoder.current) &&
                 areSetsEqual(nyeKanter, forrigeEdges.current) &&
                 forrigeEmoji.current === emoji &&
-                forrigeIngresser.current === visIngresser
+                forrigeIngresser.current === visIngresser &&
+                forrigeFysikk.current === fysikk
             ) {
                 return
             }
@@ -103,7 +106,22 @@ export function Graph({
                         color: { color: '#ff5a5a', highlight: '#ff5a5a', hover: '#ff5a5a' },
                     },
                 },
-                physics: {
+            }
+            if (fysikk === 'forceAtlas2Based') {
+                options.physics = {
+                    enabled: true,
+                    solver: 'forceAtlas2Based',
+                    maxVelocity: 30,
+                    minVelocity: 3,
+                    timestep: 0.5,
+                    stabilization: {
+                        enabled: true,
+                        iterations: 100,
+                        updateInterval: 50,
+                    },
+                }
+            } else {
+                options.physics = {
                     enabled: true,
                     barnesHut: {
                         gravitationalConstant: -40000,
@@ -122,7 +140,7 @@ export function Graph({
                         iterations: 100,
                         updateInterval: 50,
                     },
-                },
+                }
             }
             Array.from(grupper).forEach((gruppe) => {
                 options.groups[gruppe] = {
@@ -143,7 +161,7 @@ export function Graph({
                 nettverkErRendret.current = true
             }, 20)
         }
-    }, [visIngresser, data, brukFysikk, emoji])
+    }, [visIngresser, data, brukFysikk, emoji, fysikk])
 
     useEffect(() => {
         if (networkRef.current) {
