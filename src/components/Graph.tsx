@@ -87,7 +87,7 @@ export function Graph({
                 physics: {
                     enabled: brukFysikk,
                     barnesHut: {
-                        gravitationalConstant: -30000,
+                        gravitationalConstant: -40000,
                         centralGravity: 0.3,
                         springLength: 110,
                         springConstant: 0.04,
