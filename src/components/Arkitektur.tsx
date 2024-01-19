@@ -1,7 +1,7 @@
 'use client'
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
+import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
 import { Alert, Button, Chips, Loader, Radio, RadioGroup, Select, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
 import { CogIcon } from '@navikt/aksel-icons'
 
@@ -10,13 +10,14 @@ import { fetchJsonMedRequestId } from '@/utlis/fetch'
 import { Graph } from '@/components/Graph'
 import { ArkitekturNode, kalkulerNoder } from '@/nodes/kalkulerNoder'
 import { Trie } from '@/trie/Trie'
-import { namespaceToColor } from '@/namespace/farger'
+import { namespaceToAkselColor, namespaceToColor } from '@/namespace/farger'
 import { SideMeny } from '@/components/SideMeny'
 
 export const Arkitektur = (): ReactElement => {
     const [env] = useQueryState('env', parseAsString.withDefault('prod'))
     const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('app'))
     const [brukFysikk, setBrukFysikk] = useState(false)
+    const [visEmoji, setVisEmoji] = useQueryState('emoji', parseAsBoolean.withDefault(false))
 
     const [nivaaerUt, setNivaaerUt] = useQueryState('nivaaerUt', parseAsInteger.withDefault(1))
     const [nivaaerInn, setNivaaerInn] = useQueryState('nivaaerInn', parseAsInteger.withDefault(1))
@@ -219,16 +220,28 @@ export const Arkitektur = (): ReactElement => {
                 </div>
                 <div className="mt-2">
                     <Chips>
-                        {valgteApper.map((app) => (
-                            <Chips.Removable
-                                key={app}
-                                onDelete={() => {
-                                    setApper(valgteApper.filter((o) => o !== app))
-                                }}
-                            >
-                                {app}
-                            </Chips.Removable>
-                        ))}
+                        {valgteApper.map((app) => {
+                            const splitt = app.split('.')
+
+                            function skapClassName(): string {
+                                if (splitt.length > 2) {
+                                    return namespaceToAkselColor(splitt[1])
+                                }
+                                return namespaceToAkselColor(splitt[0])
+                            }
+
+                            return (
+                                <Chips.Removable
+                                    key={app}
+                                    onDelete={() => {
+                                        setApper(valgteApper.filter((o) => o !== app))
+                                    }}
+                                    className={skapClassName()}
+                                >
+                                    {app}
+                                </Chips.Removable>
+                            )
+                        })}
                     </Chips>
                 </div>
             </div>
@@ -251,6 +264,7 @@ export const Arkitektur = (): ReactElement => {
                     nivaaerInn={nivaaerInn}
                     initielleSlettedeNoder={initielleSlettedeNoder.current}
                     brukFysikk={brukFysikk}
+                    emoji={visEmoji}
                 />
             )}
             <SideMeny
@@ -262,6 +276,8 @@ export const Arkitektur = (): ReactElement => {
                 setApper={setApper}
                 brukFysikk={brukFysikk}
                 setBrukFysikk={setBrukFysikk}
+                visEmoji={visEmoji}
+                setVisEmoji={setVisEmoji}
             ></SideMeny>
             {slettNoder && (
                 <div className="fixed bottom-10 left-0 m-10 bg-gray-100 p-5 rounded">

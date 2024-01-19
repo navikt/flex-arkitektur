@@ -11,6 +11,8 @@ interface SideMenyProps {
     setApper: (apper: string[]) => void
     brukFysikk: boolean
     setBrukFysikk: (b: boolean) => void
+    visEmoji: boolean
+    setVisEmoji: (b: boolean) => void
 }
 
 export function SideMeny({
@@ -21,6 +23,8 @@ export function SideMeny({
     setApper,
     brukFysikk,
     setBrukFysikk,
+    visEmoji,
+    setVisEmoji,
 }: SideMenyProps): React.JSX.Element {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
 
@@ -75,6 +79,9 @@ export function SideMeny({
                             <option value="dev">Utvikling</option>
                         </Select>
                     </div>
+                    <Switch checked={visEmoji} onChange={() => setVisEmoji(!visEmoji)}>
+                        Vis team emoji 😊
+                    </Switch>
                     <Switch checked={visKafka} onChange={() => setVisKafka(!visKafka)}>
                         Kafka avhengigheter
                     </Switch>

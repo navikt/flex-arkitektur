@@ -19,6 +19,7 @@ export function Graph({
     nivaaerUt,
     nivaaerInn,
     brukFysikk,
+    emoji,
 }: {
     arkitekturNoder: ArkitekturNode[]
     valgteNamespaces: string[]
@@ -30,11 +31,13 @@ export function Graph({
     nivaaerUt: number
     nivaaerInn: number
     brukFysikk: boolean
+    emoji: boolean
 }): ReactElement {
     const container = useRef(null)
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
     const forrigeNoder = useRef(new Set<string>())
     const forrigeEdges = useRef(new Set<string>())
+    const forrigeEmoji = useRef(emoji)
     const networkRef = useRef<Network>()
     const [visSynkroneAppKall] = useQueryState('synkroneKall', parseAsBoolean.withDefault(true))
     const [visEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
@@ -58,6 +61,7 @@ export function Graph({
         visDatabase,
         nivaaerInn,
         nivaaerUt,
+        emoji,
     })
     const nettverkErRendret = useRef(false)
 
@@ -74,10 +78,14 @@ export function Graph({
             const nyeNoder = new Set(data.nodes.map((node) => node.id as string))
             const nyeKanter = new Set(data.edges.map((edge) => edge.id as string))
 
-            if (areSetsEqual(nyeNoder, forrigeNoder.current) && areSetsEqual(nyeKanter, forrigeEdges.current)) {
+            if (
+                areSetsEqual(nyeNoder, forrigeNoder.current) &&
+                areSetsEqual(nyeKanter, forrigeEdges.current) &&
+                forrigeEmoji.current === emoji
+            ) {
                 return
             }
-
+            forrigeEmoji.current = emoji
             forrigeNoder.current = nyeNoder
             forrigeEdges.current = nyeKanter
             const grupper = new Set<string>()
@@ -131,7 +139,7 @@ export function Graph({
                 nettverkErRendret.current = true
             }, 20)
         }
-    }, [data, brukFysikk])
+    }, [data, brukFysikk, emoji])
 
     useEffect(() => {
         if (networkRef.current) {

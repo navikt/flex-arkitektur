@@ -17,6 +17,7 @@ interface KalkulasjonOptions {
     initielleSlettedeNoder: string[]
     nivaaerInn: number
     nivaaerUt: number
+    emoji: boolean
 }
 
 export function kalkulerNoderOgKanter({
@@ -28,6 +29,7 @@ export function kalkulerNoderOgKanter({
     initielleSlettedeNoder,
     nivaaerInn,
     nivaaerUt,
+    emoji,
 }: KalkulasjonOptions): NoderOgKanter {
     const noderBerortUt = new Map<string, ArkitekturNode>()
 
@@ -122,7 +124,7 @@ export function kalkulerNoderOgKanter({
         if (node.nodeType == 'app') {
             data.nodes.push({
                 id: node.id,
-                label: `${namespaceToEmoji(node.namespace || '')} ${node.navn} \n\n  applikasjon`,
+                label: `${namespaceToEmoji(emoji, node.namespace)} ${node.navn} \n\n  applikasjon`,
                 shape: 'box',
                 margin: {
                     top: 20,
@@ -140,7 +142,7 @@ export function kalkulerNoderOgKanter({
         if (node.nodeType == 'topic') {
             data.nodes.push({
                 id: node.id,
-                label: `${namespaceToEmoji(node.namespace || '')} ${node.navn} \n kafka topic`,
+                label: `${namespaceToEmoji(emoji, node.namespace)} ${node.navn} \n kafka topic`,
                 shape: 'box',
                 margin: {
                     top: 10,
@@ -158,7 +160,7 @@ export function kalkulerNoderOgKanter({
         if (node.nodeType == 'ekstern') {
             data.nodes.push({
                 id: node.id,
-                label: `${namespaceToEmoji(node.namespace || '')} ${node.navn}`,
+                label: `${namespaceToEmoji(emoji, node.namespace)}${node.navn}`,
                 shape: 'triangle',
                 group: node.namespace,
                 font: {
