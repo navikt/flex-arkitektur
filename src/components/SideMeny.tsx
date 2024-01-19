@@ -9,6 +9,8 @@ interface SideMenyProps {
     setSlettNoder: (b: boolean) => void
     setNamespaces: (namespaces: string[]) => void
     setApper: (apper: string[]) => void
+    brukFysikk: boolean
+    setBrukFysikk: (b: boolean) => void
 }
 
 export function SideMeny({
@@ -17,6 +19,8 @@ export function SideMeny({
     setSlettNoder,
     setNamespaces,
     setApper,
+    brukFysikk,
+    setBrukFysikk,
 }: SideMenyProps): React.JSX.Element {
     const [env, setEnv] = useQueryState('env', parseAsString.withDefault('prod'))
 
@@ -28,7 +32,6 @@ export function SideMeny({
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [, setFilterTekst] = useState(filter.join(' '))
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
-    const [brukFysikk, setBrukFysikk] = useQueryState('fysikk', parseAsBoolean.withDefault(true))
 
     return (
         <Modal
@@ -89,7 +92,7 @@ export function SideMeny({
                         Databaser
                     </Switch>
                     <Switch checked={brukFysikk} onChange={() => setBrukFysikk(!brukFysikk)}>
-                        Fysikk i visualisering
+                        Automatisk organisering av noder
                     </Switch>
                     <Button
                         variant="danger"

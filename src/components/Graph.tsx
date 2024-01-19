@@ -18,6 +18,7 @@ export function Graph({
     valgeApper,
     nivaaerUt,
     nivaaerInn,
+    brukFysikk,
 }: {
     arkitekturNoder: ArkitekturNode[]
     valgteNamespaces: string[]
@@ -28,6 +29,7 @@ export function Graph({
     valgeApper: string[]
     nivaaerUt: number
     nivaaerInn: number
+    brukFysikk: boolean
 }): ReactElement {
     const container = useRef(null)
     const [, setSlettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
@@ -38,8 +40,6 @@ export function Graph({
     const [visEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
     const [visDatabase] = useQueryState('database', parseAsBoolean.withDefault(true))
     const [visKafka] = useQueryState('kafka', parseAsBoolean.withDefault(true))
-    const [brukFysikk] = useQueryState('fysikk', parseAsBoolean.withDefault(true))
-    const forrigeFysikk = useRef(brukFysikk)
 
     const filtrerteNoder = filtrerArkitekturNoder(
         arkitekturNoder,
@@ -59,22 +59,27 @@ export function Graph({
         nivaaerInn,
         nivaaerUt,
     })
+    const nettverkErRendret = useRef(false)
+
+    useEffect(() => {
+        if (nettverkErRendret.current) {
+            if (networkRef.current) {
+                networkRef.current?.setOptions({ physics: { enabled: brukFysikk } })
+            }
+        }
+    }, [brukFysikk])
 
     useEffect(() => {
         if (container.current) {
             const nyeNoder = new Set(data.nodes.map((node) => node.id as string))
             const nyeKanter = new Set(data.edges.map((edge) => edge.id as string))
 
-            if (
-                areSetsEqual(nyeNoder, forrigeNoder.current) &&
-                areSetsEqual(nyeKanter, forrigeEdges.current) &&
-                forrigeFysikk.current === brukFysikk
-            ) {
+            if (areSetsEqual(nyeNoder, forrigeNoder.current) && areSetsEqual(nyeKanter, forrigeEdges.current)) {
                 return
             }
+
             forrigeNoder.current = nyeNoder
             forrigeEdges.current = nyeKanter
-            forrigeFysikk.current = brukFysikk
             const grupper = new Set<string>()
             data.nodes.forEach((node) => {
                 if (node.group === undefined) return
@@ -87,7 +92,7 @@ export function Graph({
                     },
                 },
                 physics: {
-                    enabled: brukFysikk,
+                    enabled: true,
                     barnesHut: {
                         gravitationalConstant: -40000,
                         centralGravity: 0.3,
@@ -118,6 +123,13 @@ export function Graph({
                 }
             })
             networkRef.current = new Network(container.current, data, options)
+
+            setTimeout(() => {
+                if (!brukFysikk) {
+                    networkRef.current?.setOptions({ physics: { enabled: brukFysikk } })
+                }
+                nettverkErRendret.current = true
+            }, 20)
         }
     }, [data, brukFysikk])
 
@@ -150,6 +162,7 @@ export function Graph({
             }
         }
     }, [slettNoder, setSlettedeNoder])
+
     const grupper = new Set<string>()
     data.nodes.forEach((node) => {
         if (node.group === undefined) return

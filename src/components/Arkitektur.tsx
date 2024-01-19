@@ -16,6 +16,7 @@ import { SideMeny } from '@/components/SideMeny'
 export const Arkitektur = (): ReactElement => {
     const [env] = useQueryState('env', parseAsString.withDefault('prod'))
     const [sokemetode, setSokemetode] = useQueryState('sokemetode', parseAsString.withDefault('app'))
+    const [brukFysikk, setBrukFysikk] = useState(false)
 
     const [nivaaerUt, setNivaaerUt] = useQueryState('nivaaerUt', parseAsInteger.withDefault(1))
     const [nivaaerInn, setNivaaerInn] = useQueryState('nivaaerInn', parseAsInteger.withDefault(1))
@@ -249,6 +250,7 @@ export const Arkitektur = (): ReactElement => {
                     nivaaerUt={nivaaerUt}
                     nivaaerInn={nivaaerInn}
                     initielleSlettedeNoder={initielleSlettedeNoder.current}
+                    brukFysikk={brukFysikk}
                 />
             )}
             <SideMeny
@@ -258,10 +260,12 @@ export const Arkitektur = (): ReactElement => {
                 setOpenState={setSideMenyOpen}
                 setNamespaces={setNamespaces}
                 setApper={setApper}
+                brukFysikk={brukFysikk}
+                setBrukFysikk={setBrukFysikk}
             ></SideMeny>
             {slettNoder && (
                 <div className="fixed bottom-10 left-0 m-10 bg-gray-100 p-5 rounded">
-                    <Alert variant="error">Klikk på noder og kanter du vil fjerne fra visualiseringen.</Alert>
+                    <Alert variant="info">Klikk på noder og kanter du vil fjerne fra visualiseringen.</Alert>
                     <Button
                         className="mt-2"
                         variant="primary"
