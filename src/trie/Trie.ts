@@ -18,7 +18,7 @@ export class Trie {
         }
         node.isEndOfWord = true
         node.word = word
-        node.arkitekturNode = arkitekturNode
+        node.arkitekturNode.push(arkitekturNode)
     }
 
     findAllWithPrefix(prefix: string): Array<ArkitekturNode> {
@@ -35,7 +35,7 @@ export class Trie {
     private _findAllWords(node: TrieNode): Array<ArkitekturNode> {
         let arkitekturNodes: Array<ArkitekturNode> = []
         if (node.isEndOfWord && node.arkitekturNode) {
-            arkitekturNodes.push(node.arkitekturNode)
+            arkitekturNodes.push(...node.arkitekturNode)
         }
 
         for (const childNode of node.children.values()) {
