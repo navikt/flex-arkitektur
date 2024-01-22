@@ -86,7 +86,9 @@ export const Arkitektur = (): ReactElement => {
     const trie = useMemo(() => {
         const minTrie = new Trie()
         arkitekturNoder.forEach((app) => {
+            if (app.nodeType === 'database') return
             minTrie.insert(app.navn, app)
+            minTrie.insert(app.id, app)
         })
 
         return minTrie
@@ -97,11 +99,13 @@ export const Arkitektur = (): ReactElement => {
             return []
         }
 
-        return trie
-            .findAllWithPrefix(appFilter)
-            .map((app) => app.id)
-            .filter((app) => !valgteApper.includes(app))
-            .sort()
+        const set = new Set(
+            trie
+                .findAllWithPrefix(appFilter)
+                .map((app) => app.id)
+                .filter((app) => !valgteApper.includes(app)),
+        )
+        return Array.from(set.values()).sort()
     }, [trie, appFilter, valgteApper])
 
     if (error) {
