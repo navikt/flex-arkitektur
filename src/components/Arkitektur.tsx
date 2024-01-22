@@ -101,6 +101,7 @@ export const Arkitektur = (): ReactElement => {
             .findAllWithPrefix(appFilter)
             .map((app) => app.id)
             .filter((app) => !valgteApper.includes(app))
+            .sort()
     }, [trie, appFilter, valgteApper])
 
     if (error) {
@@ -218,32 +219,34 @@ export const Arkitektur = (): ReactElement => {
                         />
                     </div>
                 </div>
-                <div className="mt-2">
-                    <Chips>
-                        {valgteApper.map((app) => {
-                            const splitt = app.split('.')
+                {sokemetode == 'app' && (
+                    <div className="mt-2">
+                        <Chips>
+                            {valgteApper.map((app) => {
+                                const splitt = app.split('.')
 
-                            function skapClassName(): string {
-                                if (splitt.length > 2) {
-                                    return namespaceToAkselColor(splitt[1])
+                                function skapClassName(): string {
+                                    if (splitt.length > 2) {
+                                        return namespaceToAkselColor(splitt[1])
+                                    }
+                                    return namespaceToAkselColor(splitt[0])
                                 }
-                                return namespaceToAkselColor(splitt[0])
-                            }
 
-                            return (
-                                <Chips.Removable
-                                    key={app}
-                                    onDelete={() => {
-                                        setApper(valgteApper.filter((o) => o !== app))
-                                    }}
-                                    className={skapClassName()}
-                                >
-                                    {app}
-                                </Chips.Removable>
-                            )
-                        })}
-                    </Chips>
-                </div>
+                                return (
+                                    <Chips.Removable
+                                        key={app}
+                                        onDelete={() => {
+                                            setApper(valgteApper.filter((o) => o !== app))
+                                        }}
+                                        className={skapClassName()}
+                                    >
+                                        {app}
+                                    </Chips.Removable>
+                                )
+                            })}
+                        </Chips>
+                    </div>
+                )}
             </div>
             {isFetching && (
                 <div className="flex justify-center items-center h-[60vh] w-100">
