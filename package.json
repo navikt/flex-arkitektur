@@ -32,7 +32,7 @@
         "@types/react-dom": "18.2.18",
         "autoprefixer": "10.4.16",
         "next": "14.0.4",
-        "next-usequerystate": "^1.14.0",
+        "next-usequerystate": "^1.15.4",
         "postcss": "8.4.33",
         "react": "18.2.0",
         "react-dom": "18.2.0",
