@@ -8,6 +8,9 @@ export function filtrerArkitekturNoder(
     filter: string[],
     sokemetode: string,
 ): ArkitekturNode[] {
+    if (sokemetode === 'alt') {
+        return arkitekturNoder
+    }
     return arkitekturNoder
         .filter((app) => {
             if (sokemetode !== 'namespace') return true

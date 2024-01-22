@@ -198,24 +198,27 @@ export function Graph({
         if (node.group === undefined) return
         grupper.add(node.group)
     })
+    const gruppeliste = Array.from(grupper)
     return (
         <>
             <div ref={container} style={{ height: 'calc(100vh - 20vh' }} />
-            <div style={{ position: 'absolute', zIndex: 1000, bottom: '10px', left: '20px' }}>
-                <Chips>
-                    {Array.from(grupper).map((namespace) => {
-                        return (
-                            <Chips.Toggle
-                                key={namespace}
-                                className={namespaceToAkselColor(namespace) + ' text-white'}
-                                checkmark={false}
-                            >
-                                {namespace}
-                            </Chips.Toggle>
-                        )
-                    })}
-                </Chips>
-            </div>
+            {gruppeliste.length < 20 && (
+                <div style={{ position: 'absolute', zIndex: 1000, bottom: '10px', left: '20px' }}>
+                    <Chips>
+                        {gruppeliste.map((namespace) => {
+                            return (
+                                <Chips.Toggle
+                                    key={namespace}
+                                    className={namespaceToAkselColor(namespace) + ' text-white'}
+                                    checkmark={false}
+                                >
+                                    {namespace}
+                                </Chips.Toggle>
+                            )
+                        })}
+                    </Chips>
+                </div>
+            )}
         </>
     )
 }

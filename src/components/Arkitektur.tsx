@@ -140,6 +140,7 @@ export const Arkitektur = (): ReactElement => {
                     >
                         <Radio value="app">App / Api / Topic</Radio>
                         <Radio value="namespace">Namespace</Radio>
+                        <Radio value="alt">Vis alt</Radio>
                     </RadioGroup>
                     {sokemetode == 'namespace' && (
                         <UNSAFE_Combobox
@@ -171,34 +172,39 @@ export const Arkitektur = (): ReactElement => {
                         />
                     )}
 
-                    <Select
-                        label="Nivåer ut"
-                        value={nivaaerUt + ''}
-                        onChange={(e) => {
-                            setNivaaerUt(Number(e.target.value))
-                        }}
-                    >
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="5">4</option>
-                        <option value="6">5</option>
-                    </Select>
-                    <Select
-                        label="Nivåer inn"
-                        value={nivaaerInn + ''}
-                        onChange={(e) => {
-                            setNivaaerInn(Number(e.target.value))
-                        }}
-                    >
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="5">4</option>
-                        <option value="6">5</option>
-                    </Select>
+                    {sokemetode !== 'alt' && (
+                        <>
+                            <Select
+                                label="Nivåer ut"
+                                value={nivaaerUt + ''}
+                                onChange={(e) => {
+                                    setNivaaerUt(Number(e.target.value))
+                                }}
+                            >
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="5">4</option>
+                                <option value="6">5</option>
+                            </Select>
+                            <Select
+                                label="Nivåer inn"
+                                value={nivaaerInn + ''}
+                                onChange={(e) => {
+                                    setNivaaerInn(Number(e.target.value))
+                                }}
+                            >
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="5">4</option>
+                                <option value="6">5</option>
+                            </Select>
+                        </>
+                    )}
+
                     {sokemetode == 'namespace' && (
                         <TextField
                             label="Filter"
@@ -223,6 +229,11 @@ export const Arkitektur = (): ReactElement => {
                         />
                     </div>
                 </div>
+                {sokemetode == 'alt' && (
+                    <div className="mt-2">
+                        <Alert variant="info">Viser alle noder, dette er litt tregt</Alert>
+                    </div>
+                )}
                 {sokemetode == 'app' && (
                     <div className="mt-2">
                         <Chips>
