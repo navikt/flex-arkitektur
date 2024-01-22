@@ -128,7 +128,7 @@ export const Arkitektur = (): ReactElement => {
 
     return (
         <>
-            <div className="h-40 p-10">
+            <div className="h-46 px-10 py-5">
                 <div className="flex gap-3">
                     <RadioGroup
                         legend="Søkemetode"

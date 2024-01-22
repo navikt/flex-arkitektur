@@ -201,7 +201,7 @@ export function Graph({
     const gruppeliste = Array.from(grupper)
     return (
         <>
-            <div ref={container} style={{ height: 'calc(100vh - 20vh' }} />
+            <div ref={container} style={{ height: 'calc(100vh - 28vh' }} />
             {gruppeliste.length < 20 && (
                 <div style={{ position: 'absolute', zIndex: 1000, bottom: '10px', left: '20px' }}>
                     <Chips>
