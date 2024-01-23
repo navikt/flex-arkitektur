@@ -1,1 +1,2 @@
-ingress: https://flex-arkitektur.intern.dev.nav.no
+ingresses:
+  - https://flex-arkitektur.intern.dev.nav.no
