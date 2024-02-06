@@ -85,10 +85,13 @@ export const Arkitektur = (): ReactElement => {
 
     const trie = useMemo(() => {
         const minTrie = new Trie()
-        arkitekturNoder.forEach((app) => {
-            if (app.nodeType === 'database') return
-            minTrie.insert(app.navn, app)
-            minTrie.insert(app.id, app)
+        arkitekturNoder.forEach((node) => {
+            if (node.nodeType === 'database') {
+                minTrie.insert(node.navn + '-db', node)
+                minTrie.insert(node.navn + '-database', node)
+            }
+            minTrie.insert(node.navn, node)
+            minTrie.insert(node.id, node)
         })
 
         return minTrie
