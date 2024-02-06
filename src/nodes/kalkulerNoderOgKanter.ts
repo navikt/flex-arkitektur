@@ -59,7 +59,7 @@ export function kalkulerNoderOgKanter({
                 })
             }
             if (visKafka) {
-                node.readTopic.forEach((out) => {
+                node.writeTopic.forEach((out) => {
                     noderBerortUt.set(out.id, out)
                 })
                 node.blirLestAvApp.forEach((inn) => {
@@ -96,7 +96,7 @@ export function kalkulerNoderOgKanter({
                 })
             }
             if (visKafka) {
-                node.writeTopic.forEach((inn) => {
+                node.readTopic.forEach((inn) => {
                     noderBerortInn.set(inn.id, inn)
                 })
                 node.blirSkrevetTilAvApp.forEach((inn) => {
