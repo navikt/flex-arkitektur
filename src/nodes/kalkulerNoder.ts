@@ -74,12 +74,12 @@ export function kalkulerNoder(data: NaisApp[]): ArkitekturNode[] {
     data.forEach((app) => {
         app.write_topics?.forEach((topic) => {
             const namespace = topic.split('.')[1]
-            const topicNavn = topic.split('.')[2]
+            const topicNavn = topic.split('.').slice(2).join('.')
             nodeMap.set(topic, new ArkitekturNode(topic, topicNavn, namespace, 'topic'))
         })
         app.read_topics?.forEach((topic) => {
             const namespace = topic.split('.')[1]
-            const topicNavn = topic.split('.')[2]
+            const topicNavn = topic.split('.').slice(2).join('.')
             nodeMap.set(topic, new ArkitekturNode(topic, topicNavn, namespace, 'topic'))
         })
     })
