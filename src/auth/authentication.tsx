@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 import { logger } from '@navikt/next-logger'
-import { validateAzureToken } from '@navikt/next-auth-wonderwall'
+import { validateAzureToken } from '@navikt/oasis'
 import { redirect } from 'next/navigation'
 
 import { isLocalOrDemo } from '@/utlis/env'
@@ -25,13 +25,12 @@ export async function verifyUserLoggedIn(): Promise<void> {
     }
 
     const validationResult = await validateAzureToken(bearerToken)
-    if (validationResult !== 'valid') {
-        if (validationResult.errorType !== 'EXPIRED') {
+    if (!validationResult.ok) {
+        if (validationResult.errorType !== 'token expired') {
             logger.error(
-                new Error(
-                    `Invalid JWT token found (cause: ${validationResult.errorType} ${validationResult.message}, redirecting to login.`,
-                    { cause: validationResult.error },
-                ),
+                new Error(`Invalid JWT token found (cause: ${validationResult.errorType}, redirecting to login.`, {
+                    cause: validationResult.error,
+                }),
             )
         }
         redirect(`/oauth2/login?redirect=${redirectPath}`)
