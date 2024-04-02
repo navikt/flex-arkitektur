@@ -14,9 +14,6 @@ export async function verifyUserLoggedIn(): Promise<void> {
     }
 
     const redirectPath = requestHeaders.get('x-path')
-    if (!redirectPath == null) {
-        logger.warn("Missing 'x-path' header, is middleware middlewaring?")
-    }
 
     const bearerToken: string | null | undefined = requestHeaders.get('authorization')
     if (!bearerToken) {
