@@ -18,7 +18,7 @@
         "format": "npm run prettier:write && npm run lint:fix"
     },
     "dependencies": {
-        "@google-cloud/bigquery": "^7.5.1",
+        "@google-cloud/bigquery": "^7.5.2",
         "@navikt/aksel-icons": "^6.3.4",
         "@navikt/ds-css": "^6.3.4",
         "@navikt/ds-react": "^6.3.4",
