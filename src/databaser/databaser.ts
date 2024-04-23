@@ -69,11 +69,6 @@ const flexDatabaser = [
         namespace: 'flex',
         databases: ['sykepengesoknad-nl-varsel-db'],
     },
-    {
-        appName: 'sykepengesoknad-sak-status-metrikk',
-        namespace: 'flex',
-        databases: ['sykepengesoknad-sak-status-metrikk-db'],
-    },
 ]
 
 const teamsykmeldingDatabaser = [
