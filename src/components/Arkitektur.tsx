@@ -169,8 +169,8 @@ export const Arkitektur = (): ReactElement => {
                                     setApper([...valgteApper, app])
                                 }
                             }}
-                            onChange={(e) => {
-                                if (e?.target?.value) setAppFilter(e.target.value)
+                            onChange={(value) => {
+                                if (value) setAppFilter(value)
                             }}
                         />
                     )}
