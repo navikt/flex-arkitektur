@@ -10,6 +10,7 @@ import { namespaceToAkselColor, namespaceToColor } from '@/namespace/farger'
 
 export function Graph({
     arkitekturNoder,
+    fullscreen,
     valgteNamespaces,
     slettNoder,
     filter,
@@ -24,6 +25,7 @@ export function Graph({
     arkitekturNoder: ArkitekturNode[]
     valgteNamespaces: string[]
     slettNoder: boolean
+    fullscreen: boolean
     filter: string[]
     initielleSlettedeNoder: string[]
     sokemetode: string
@@ -199,9 +201,17 @@ export function Graph({
         grupper.add(node.group)
     })
     const gruppeliste = Array.from(grupper)
+
+    function height(): string {
+        if (fullscreen) {
+            return '100vh'
+        }
+        return 'calc(100vh - 28vh)'
+    }
+
     return (
         <>
-            <div ref={container} style={{ height: 'calc(100vh - 28vh' }} />
+            <div ref={container} style={{ height: height() }} />
             {gruppeliste.length < 20 && (
                 <div style={{ position: 'absolute', zIndex: 1000, bottom: '10px', left: '20px' }}>
                     <Chips>

@@ -3,7 +3,7 @@ import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react
 import { useQuery } from '@tanstack/react-query'
 import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
 import { Alert, Button, Chips, Loader, Radio, RadioGroup, Select, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
-import { CogIcon } from '@navikt/aksel-icons'
+import { CogIcon, ExpandIcon, ShrinkIcon } from '@navikt/aksel-icons'
 
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
@@ -30,6 +30,7 @@ export const Arkitektur = (): ReactElement => {
     const initielleSlettedeNoder = useRef(slettedeNoder)
 
     const [hasTyped, setHasTyped] = useState(false)
+    const [fullscreen, setFullscreen] = useQueryState('fullscreen', parseAsBoolean.withDefault(false))
     const namespaceCombobox = useRef<HTMLInputElement>(null)
     const [valgteNamespaces, setNamespaces] = useQueryState(
         'namespace',
@@ -131,141 +132,157 @@ export const Arkitektur = (): ReactElement => {
 
     return (
         <>
-            <div className="h-46 px-10 py-5">
-                <div className="flex gap-3">
-                    <RadioGroup
-                        legend="Søkemetode"
-                        size="small"
-                        value={sokemetode}
-                        onChange={(val: string) => {
-                            setSokemetode(val)
-                        }}
-                    >
-                        <Radio value="app">App / Api / Topic</Radio>
-                        <Radio value="namespace">Namespace</Radio>
-                        <Radio value="alt">Vis alt</Radio>
-                    </RadioGroup>
-                    {sokemetode == 'namespace' && (
-                        <UNSAFE_Combobox
-                            ref={namespaceCombobox}
-                            label="Namespace"
-                            options={alleNamespaces}
-                            isMultiSelect
-                            selectedOptions={valgteNamespaces}
-                            onToggleSelected={onNamespaceSelected}
-                        />
+            {fullscreen && (
+                <Button
+                    variant="secondary-neutral"
+                    className="mr-2 fixed top-10 right-10 z-50"
+                    onClick={() => setFullscreen(false)}
+                    icon={<ShrinkIcon title="Fullscreen" />}
+                />
+            )}
+            {!fullscreen && (
+                <div className="h-46 px-10 py-5">
+                    <div className="flex gap-3">
+                        <RadioGroup
+                            legend="Søkemetode"
+                            size="small"
+                            value={sokemetode}
+                            onChange={(val: string) => {
+                                setSokemetode(val)
+                            }}
+                        >
+                            <Radio value="app">App / Api / Topic</Radio>
+                            <Radio value="namespace">Namespace</Radio>
+                            <Radio value="alt">Vis alt</Radio>
+                        </RadioGroup>
+                        {sokemetode == 'namespace' && (
+                            <UNSAFE_Combobox
+                                ref={namespaceCombobox}
+                                label="Namespace"
+                                options={alleNamespaces}
+                                isMultiSelect
+                                selectedOptions={valgteNamespaces}
+                                onToggleSelected={onNamespaceSelected}
+                            />
+                        )}
+                        {sokemetode == 'app' && (
+                            <UNSAFE_Combobox
+                                label="App / Api / Topic"
+                                className="w-96"
+                                options={[...filteredApper]}
+                                clearButton={true}
+                                filteredOptions={filteredApper}
+                                selectedOptions={[]}
+                                onToggleSelected={(app) => {
+                                    if (app) {
+                                        if (valgteApper.includes(app)) return
+                                        setApper([...valgteApper, app])
+                                    }
+                                }}
+                                onChange={(value) => {
+                                    if (value) setAppFilter(value)
+                                }}
+                            />
+                        )}
+
+                        {sokemetode !== 'alt' && (
+                            <>
+                                <Select
+                                    label="Nivåer ut"
+                                    value={nivaaerUt + ''}
+                                    onChange={(e) => {
+                                        setNivaaerUt(Number(e.target.value))
+                                    }}
+                                >
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="5">4</option>
+                                    <option value="6">5</option>
+                                </Select>
+                                <Select
+                                    label="Nivåer inn"
+                                    value={nivaaerInn + ''}
+                                    onChange={(e) => {
+                                        setNivaaerInn(Number(e.target.value))
+                                    }}
+                                >
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="5">4</option>
+                                    <option value="6">5</option>
+                                </Select>
+                            </>
+                        )}
+
+                        {sokemetode == 'namespace' && (
+                            <TextField
+                                label="Filter"
+                                value={filterTekst}
+                                onChange={(e) => {
+                                    setFilterTekst(e.target.value)
+                                    setHasTyped(true)
+                                }}
+                                onKeyUp={(e) => {
+                                    if (e.key === 'Enter') {
+                                        setFilter(filterTekst.split(' '))
+                                    }
+                                }}
+                            />
+                        )}
+
+                        <div className="self-end">
+                            <Button
+                                variant="secondary-neutral"
+                                className="mr-2"
+                                onClick={() => setFullscreen(true)}
+                                icon={<ExpandIcon title="Fullscreen" />}
+                            />
+                            <Button
+                                variant="secondary-neutral"
+                                onClick={() => setSideMenyOpen(!sideMenyOpen)}
+                                icon={<CogIcon title="Innstillinger" />}
+                            />
+                        </div>
+                    </div>
+                    {sokemetode == 'alt' && (
+                        <div className="mt-2">
+                            <Alert variant="info">Viser alle noder, dette er litt tregt</Alert>
+                        </div>
                     )}
                     {sokemetode == 'app' && (
-                        <UNSAFE_Combobox
-                            label="App / Api / Topic"
-                            className="w-96"
-                            options={[...filteredApper]}
-                            clearButton={true}
-                            filteredOptions={filteredApper}
-                            selectedOptions={[]}
-                            onToggleSelected={(app) => {
-                                if (app) {
-                                    if (valgteApper.includes(app)) return
-                                    setApper([...valgteApper, app])
-                                }
-                            }}
-                            onChange={(value) => {
-                                if (value) setAppFilter(value)
-                            }}
-                        />
-                    )}
+                        <div className="mt-2">
+                            <Chips>
+                                {valgteApper.map((app) => {
+                                    const splitt = app.split('.')
 
-                    {sokemetode !== 'alt' && (
-                        <>
-                            <Select
-                                label="Nivåer ut"
-                                value={nivaaerUt + ''}
-                                onChange={(e) => {
-                                    setNivaaerUt(Number(e.target.value))
-                                }}
-                            >
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="5">4</option>
-                                <option value="6">5</option>
-                            </Select>
-                            <Select
-                                label="Nivåer inn"
-                                value={nivaaerInn + ''}
-                                onChange={(e) => {
-                                    setNivaaerInn(Number(e.target.value))
-                                }}
-                            >
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="5">4</option>
-                                <option value="6">5</option>
-                            </Select>
-                        </>
-                    )}
-
-                    {sokemetode == 'namespace' && (
-                        <TextField
-                            label="Filter"
-                            value={filterTekst}
-                            onChange={(e) => {
-                                setFilterTekst(e.target.value)
-                                setHasTyped(true)
-                            }}
-                            onKeyUp={(e) => {
-                                if (e.key === 'Enter') {
-                                    setFilter(filterTekst.split(' '))
-                                }
-                            }}
-                        />
-                    )}
-
-                    <div className="self-end">
-                        <Button
-                            variant="secondary-neutral"
-                            onClick={() => setSideMenyOpen(!sideMenyOpen)}
-                            icon={<CogIcon title="Innstillinger" />}
-                        />
-                    </div>
-                </div>
-                {sokemetode == 'alt' && (
-                    <div className="mt-2">
-                        <Alert variant="info">Viser alle noder, dette er litt tregt</Alert>
-                    </div>
-                )}
-                {sokemetode == 'app' && (
-                    <div className="mt-2">
-                        <Chips>
-                            {valgteApper.map((app) => {
-                                const splitt = app.split('.')
-
-                                function skapClassName(): string {
-                                    if (splitt.length > 2) {
-                                        return namespaceToAkselColor(splitt[1])
+                                    function skapClassName(): string {
+                                        if (splitt.length > 2) {
+                                            return namespaceToAkselColor(splitt[1])
+                                        }
+                                        return namespaceToAkselColor(splitt[0])
                                     }
-                                    return namespaceToAkselColor(splitt[0])
-                                }
 
-                                return (
-                                    <Chips.Removable
-                                        key={app}
-                                        onDelete={() => {
-                                            setApper(valgteApper.filter((o) => o !== app))
-                                        }}
-                                        className={skapClassName()}
-                                    >
-                                        {app}
-                                    </Chips.Removable>
-                                )
-                            })}
-                        </Chips>
-                    </div>
-                )}
-            </div>
+                                    return (
+                                        <Chips.Removable
+                                            key={app}
+                                            onDelete={() => {
+                                                setApper(valgteApper.filter((o) => o !== app))
+                                            }}
+                                            className={skapClassName()}
+                                        >
+                                            {app}
+                                        </Chips.Removable>
+                                    )
+                                })}
+                            </Chips>
+                        </div>
+                    )}
+                </div>
+            )}
             {isFetching && (
                 <div className="flex justify-center items-center h-[60vh] w-100">
                     <div>
@@ -275,6 +292,7 @@ export const Arkitektur = (): ReactElement => {
             )}
             {!isFetching && (
                 <Graph
+                    fullscreen={fullscreen}
                     arkitekturNoder={arkitekturNoder}
                     sokemetode={sokemetode}
                     valgeApper={valgteApper}
