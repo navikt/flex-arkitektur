@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@google-cloud/bigquery": "^7.9.1",
-        "@navikt/aksel-icons": "^6.16.3",
+        "@navikt/aksel-icons": "^7.2.1",
         "@navikt/ds-css": "^6.16.3",
         "@navikt/ds-react": "^6.16.3",
         "@navikt/ds-tailwind": "^6.16.3",
