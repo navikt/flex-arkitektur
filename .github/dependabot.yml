@@ -22,5 +22,6 @@ updates:
     open-pull-requests-limit: 20
     registries: '*'
     ignore:
+      - dependency-name: '@types/node'
       - dependency-name: 'eslint'
         versions: ['9.x']
