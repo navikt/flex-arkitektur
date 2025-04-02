@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { isLocalOrDemo } from '@/utlis/env'
 
 export async function verifyUserLoggedIn(): Promise<void> {
-    const requestHeaders = headers()
+    const requestHeaders = await headers()
 
     if (isLocalOrDemo) {
         logger.warn('Is running locally, skipping RSC auth')

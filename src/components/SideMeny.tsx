@@ -1,6 +1,6 @@
 import { Button, Modal, Radio, RadioGroup, Select, Switch } from '@navikt/ds-react'
 import React, { useState } from 'react'
-import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
+import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 
 interface SideMenyProps {
     openState: boolean
