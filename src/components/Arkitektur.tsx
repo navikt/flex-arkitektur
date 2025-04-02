@@ -1,7 +1,7 @@
 'use client'
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'next-usequerystate'
+import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import { Alert, Button, Chips, Loader, Radio, RadioGroup, Select, TextField, UNSAFE_Combobox } from '@navikt/ds-react'
 import { CogIcon, ExpandIcon, ShrinkIcon } from '@navikt/aksel-icons'
 

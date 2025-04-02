@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef } from 'react'
 import { Network, Options } from 'vis-network'
-import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'next-usequerystate'
+import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { Chips } from '@navikt/ds-react'
 
 import { ArkitekturNode } from '@/nodes/kalkulerNoder'
