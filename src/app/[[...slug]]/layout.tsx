@@ -1,5 +1,6 @@
 import '../../styles/globals.css'
 import React, { ReactElement } from 'react'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 import { verifyUserLoggedIn } from '@/auth/authentication'
 
@@ -22,7 +23,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </head>
             <body>
                 <div className="flex-1 mx-auto h-screen">
-                    <main>{children}</main>
+                    <main>
+                        <NuqsAdapter>{children}</NuqsAdapter>
+                    </main>
                 </div>
             </body>
         </html>
