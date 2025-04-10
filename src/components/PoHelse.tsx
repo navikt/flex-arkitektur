@@ -7,6 +7,21 @@ import { FilterIcon } from '@navikt/aksel-icons'
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
 
+type FilterKey = 'pdl' | 'aareg' | 'inntektskomp'
+
+interface Filters {
+    pdl: boolean
+    aareg: boolean
+    inntektskomp: boolean
+}
+
+// Filterkolonner som konfigurasjon med eksplisitt type
+const filterColumns: Array<{ label: string; filterKey: FilterKey }> = [
+    { label: 'PDL', filterKey: 'pdl' },
+    { label: 'AAREG', filterKey: 'aareg' },
+    { label: 'Inntektskomp', filterKey: 'inntektskomp' },
+]
+
 export const PoHelse = (): ReactElement => {
     const { data, error, isFetching } = useQuery<NaisApp[], Error>({
         queryKey: [`nais-apper`, 'dev'],
@@ -16,8 +31,11 @@ export const PoHelse = (): ReactElement => {
             return await fetchJsonMedRequestId(url)
         },
     })
-    const [filterPdl, setFilterPdl] = useState(false)
-    const [filterAareg, setFilterAareg] = useState(false)
+    const [filters, setFilters] = useState<Filters>({
+        pdl: false,
+        aareg: false,
+        inntektskomp: false,
+    })
     if (isFetching) {
         return <Loader size="xlarge" className="m-16" />
     }
@@ -29,6 +47,12 @@ export const PoHelse = (): ReactElement => {
     }
 
     const tabellApper = prosseserApper(data)
+    const toggleFilter = (key: FilterKey): void => {
+        setFilters((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+        }))
+    }
 
     return (
         <>
@@ -39,36 +63,26 @@ export const PoHelse = (): ReactElement => {
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell>App</Table.HeaderCell>
-                        <Table.HeaderCell>
-                            PDL
-                            <Button
-                                className="mx-4"
-                                variant={filterPdl ? 'secondary' : 'tertiary'}
-                                size="small"
-                                onClick={() => {
-                                    setFilterPdl(!filterPdl)
-                                }}
-                                icon={<FilterIcon title="filtrer" />}
-                            />
-                        </Table.HeaderCell>
-                        <Table.HeaderCell>
-                            AAREG
-                            <Button
-                                className="mx-4"
-                                variant={filterAareg ? 'secondary' : 'tertiary'}
-                                size="small"
-                                onClick={() => {
-                                    setFilterAareg(!filterAareg)
-                                }}
-                                icon={<FilterIcon title="filtrer" />}
-                            />
-                        </Table.HeaderCell>
+                        {filterColumns.map(({ label, filterKey }) => (
+                            <Table.HeaderCell key={filterKey}>
+                                {label}
+                                <Button
+                                    className="mx-4"
+                                    variant={filters[filterKey] ? 'secondary' : 'tertiary'}
+                                    size="small"
+                                    onClick={() => toggleFilter(filterKey)}
+                                    icon={<FilterIcon title="filtrer" />}
+                                />
+                            </Table.HeaderCell>
+                        ))}
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
                     {tabellApper
-                        .filter((app) => (filterPdl ? app.pdl.length > 0 : true))
-                        .filter((app) => (filterAareg ? app.aareg.length > 0 : true))
+                        .filter((app) => app.pdl.length > 0 || app.aareg.length > 0 || app.inntektskomp.length > 0)
+                        .filter((app) => (filters['pdl'] ? app.pdl.length > 0 : true))
+                        .filter((app) => (filters['aareg'] ? app.aareg.length > 0 : true))
+                        .filter((app) => (filters['inntektskomp'] ? app.inntektskomp.length > 0 : true))
                         .map((app, i) => {
                             return (
                                 <Table.Row key={app.name + ' ' + i}>
@@ -80,6 +94,11 @@ export const PoHelse = (): ReactElement => {
                                     </Table.DataCell>
                                     <Table.DataCell>
                                         {app.aareg.map((pdl, i) => {
+                                            return <div key={i}>{pdl}</div>
+                                        })}
+                                    </Table.DataCell>
+                                    <Table.DataCell>
+                                        {app.inntektskomp.map((pdl, i) => {
                                             return <div key={i}>{pdl}</div>
                                         })}
                                     </Table.DataCell>
@@ -96,10 +115,11 @@ interface TabellApp {
     name: string
     pdl: string[]
     aareg: string[]
+    inntektskomp: string[]
 }
 
 function prosseserApper(data: NaisApp[]): TabellApp[] {
-    const namespaces = ['tsm', 'teamsykmelding', 'flex', 'tbd', 'helsearbeidsgiver']
+    const namespaces = ['tsm', 'teamsykmelding', 'flex', 'speilvendt', 'tbd', 'risk', 'helsearbeidsgiver']
 
     const apper = data
         .filter((app) => {
@@ -132,19 +152,23 @@ function prosseserApper(data: NaisApp[]): TabellApp[] {
     // lager en liste med apper og pdl og aareg
     const tabellApper: TabellApp[] = []
     apper.forEach((app) => {
-        const pdl = app.outbound_hosts?.filter((host) => host.includes('pdl'))
-        const pdlApp = app.outbound_apps?.filter((host) => host.includes('pdl'))
-        const pdlKafka = app.read_topics?.filter((host) => host.includes('pdl'))
+        const hentDataFor = (identifier: string): string[] => {
+            const hosts = app.outbound_hosts?.filter((host) => host.includes(identifier))
+            const apps = app.outbound_apps?.filter((host) => host.includes(identifier))
+            const kafka = app.read_topics?.filter((host) => host.includes(identifier))
 
-        const pdlAlt = pdl?.concat(pdlApp ?? []).concat(pdlKafka ?? []) || []
-
-        const aareg = app.outbound_hosts?.filter((host) => host.includes('aareg'))
-        const aaregApp = app.outbound_apps?.filter((host) => host.includes('aareg'))
-        const aaregKafka = app.read_topics?.filter((host) => host.includes('aareg'))
-
-        const aaregAlt = aareg?.concat(aaregApp ?? []).concat(aaregKafka ?? []) || []
-
-        tabellApper.push({ name: app.namespace + '.' + app.name, pdl: pdlAlt, aareg: aaregAlt })
+            // Kombinerer array-ene, sjekker for null/undefined med nullish coalescing
+            return hosts?.concat(apps ?? []).concat(kafka ?? []) || []
+        }
+        const pdlData = hentDataFor('pdl')
+        const aaregData = hentDataFor('aareg')
+        const inntektskomp = hentDataFor('team-inntekt')
+        tabellApper.push({
+            name: app.namespace + '.' + app.name,
+            pdl: pdlData,
+            aareg: aaregData,
+            inntektskomp: inntektskomp,
+        })
     })
     return tabellApper
 }
