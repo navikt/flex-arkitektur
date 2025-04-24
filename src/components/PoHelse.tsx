@@ -1,7 +1,7 @@
 'use client'
 import React, { ReactElement, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Button, Heading, Loader, Table } from '@navikt/ds-react'
+import { BodyShort, Button, Heading, Loader, Table } from '@navikt/ds-react'
 import { FilterIcon } from '@navikt/aksel-icons'
 
 import { NaisApp } from '@/types'
@@ -85,7 +85,14 @@ export const PoHelse = (): ReactElement => {
                 </Table.Header>
                 <Table.Body>
                     {tabellApper
-                        .filter((app) => app.pdl.length > 0 || app.aareg.length > 0 || app.inntektskomp.length > 0)
+                        .filter(
+                            (app) =>
+                                app.pdl.length > 0 ||
+                                app.aareg.length > 0 ||
+                                app.inntektskomp.length > 0 ||
+                                app.oppgave.length > 0 ||
+                                app.dokarkiv.length > 0,
+                        )
                         .filter((app) => (filters['pdl'] ? app.pdl.length > 0 : true))
                         .filter((app) => (filters['aareg'] ? app.aareg.length > 0 : true))
                         .filter((app) => (filters['inntektskomp'] ? app.inntektskomp.length > 0 : true))
@@ -95,37 +102,54 @@ export const PoHelse = (): ReactElement => {
                             return (
                                 <Table.Row key={app.name + ' ' + i}>
                                     <Table.DataCell>{app.name}</Table.DataCell>
-                                    <Table.DataCell>
-                                        {app.pdl.map((pdl, i) => {
-                                            return <div key={i}>{pdl}</div>
-                                        })}
-                                    </Table.DataCell>
-                                    <Table.DataCell>
-                                        {app.aareg.map((pdl, i) => {
-                                            return <div key={i}>{pdl}</div>
-                                        })}
-                                    </Table.DataCell>
-                                    <Table.DataCell>
-                                        {app.inntektskomp.map((pdl, i) => {
-                                            return <div key={i}>{pdl}</div>
-                                        })}
-                                    </Table.DataCell>
-                                    <Table.DataCell>
-                                        {app.oppgave.map((oppgave, i) => {
-                                            return <div key={i}>{oppgave}</div>
-                                        })}
-                                    </Table.DataCell>
-                                    <Table.DataCell>
-                                        {app.dokarkiv.map((dokariv, i) => {
-                                            return <div key={i}>{dokariv}</div>
-                                        })}
-                                    </Table.DataCell>
+                                    <CelleForInnhold integrasjoner={app.pdl} />
+                                    <CelleForInnhold integrasjoner={app.aareg} />
+                                    <CelleForInnhold integrasjoner={app.inntektskomp} />
+                                    <CelleForInnhold integrasjoner={app.oppgave} />
+                                    <CelleForInnhold integrasjoner={app.dokarkiv} />
                                 </Table.Row>
                             )
                         })}
                 </Table.Body>
             </Table>
         </>
+    )
+}
+
+function CelleForInnhold({ integrasjoner }: { integrasjoner: string[] }): ReactElement {
+    function TagForUrl({ u }: { u: string }): ReactElement {
+        const q2Tag = <div className="bg-blue-100 max-h-6 mr-2 px-2 border">q2</div>
+
+        const q1Tag = <div className="bg-green-100 max-h-6 mr-2 px-2 border">q1</div>
+        if (u.includes('q1')) {
+            return q1Tag
+        }
+        if (u.includes('q2')) {
+            return q2Tag
+        }
+        if (u == 'aareg-services.dev-fss-pub.nais.io') {
+            return q2Tag
+        }
+        if (u == 'oppgave.dev-fss-pub.nais.io') {
+            return q2Tag
+        }
+        if (u == 'dokarkiv.dev-fss-pub.nais.io') {
+            return q1Tag
+        }
+        return <></>
+    }
+
+    return (
+        <Table.DataCell>
+            {integrasjoner.map((url, i) => {
+                return (
+                    <div className="flex" key={i}>
+                        <TagForUrl u={url} />
+                        <BodyShort>{url}</BodyShort>
+                    </div>
+                )
+            })}
+        </Table.DataCell>
     )
 }
 
@@ -170,7 +194,9 @@ function prosseserApper(data: NaisApp[]): TabellApp[] {
     })
 
     // lager en liste med apper og pdl og aareg
+
     const tabellApper: TabellApp[] = []
+
     apper.forEach((app) => {
         const hentDataFor = (identifier: string): string[] => {
             const hosts = app.outbound_hosts?.filter((host) => host.includes(identifier))
