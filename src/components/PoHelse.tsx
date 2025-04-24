@@ -7,12 +7,14 @@ import { FilterIcon } from '@navikt/aksel-icons'
 import { NaisApp } from '@/types'
 import { fetchJsonMedRequestId } from '@/utlis/fetch'
 
-type FilterKey = 'pdl' | 'aareg' | 'inntektskomp'
+type FilterKey = 'pdl' | 'aareg' | 'inntektskomp' | 'dokarkiv' | 'oppgave'
 
 interface Filters {
     pdl: boolean
     aareg: boolean
     inntektskomp: boolean
+    dokarkiv: boolean
+    oppgave: boolean
 }
 
 // Filterkolonner som konfigurasjon med eksplisitt type
@@ -20,6 +22,8 @@ const filterColumns: Array<{ label: string; filterKey: FilterKey }> = [
     { label: 'PDL', filterKey: 'pdl' },
     { label: 'AAREG', filterKey: 'aareg' },
     { label: 'Inntektskomp', filterKey: 'inntektskomp' },
+    { label: 'Oppgave', filterKey: 'oppgave' },
+    { label: 'dokarkiv', filterKey: 'dokarkiv' },
 ]
 
 export const PoHelse = (): ReactElement => {
@@ -35,6 +39,8 @@ export const PoHelse = (): ReactElement => {
         pdl: false,
         aareg: false,
         inntektskomp: false,
+        dokarkiv: false,
+        oppgave: false,
     })
     if (isFetching) {
         return <Loader size="xlarge" className="m-16" />
@@ -83,6 +89,8 @@ export const PoHelse = (): ReactElement => {
                         .filter((app) => (filters['pdl'] ? app.pdl.length > 0 : true))
                         .filter((app) => (filters['aareg'] ? app.aareg.length > 0 : true))
                         .filter((app) => (filters['inntektskomp'] ? app.inntektskomp.length > 0 : true))
+                        .filter((app) => (filters['oppgave'] ? app.oppgave.length > 0 : true))
+                        .filter((app) => (filters['dokarkiv'] ? app.dokarkiv.length > 0 : true))
                         .map((app, i) => {
                             return (
                                 <Table.Row key={app.name + ' ' + i}>
@@ -102,6 +110,16 @@ export const PoHelse = (): ReactElement => {
                                             return <div key={i}>{pdl}</div>
                                         })}
                                     </Table.DataCell>
+                                    <Table.DataCell>
+                                        {app.oppgave.map((oppgave, i) => {
+                                            return <div key={i}>{oppgave}</div>
+                                        })}
+                                    </Table.DataCell>
+                                    <Table.DataCell>
+                                        {app.dokarkiv.map((dokariv, i) => {
+                                            return <div key={i}>{dokariv}</div>
+                                        })}
+                                    </Table.DataCell>
                                 </Table.Row>
                             )
                         })}
@@ -116,6 +134,8 @@ interface TabellApp {
     pdl: string[]
     aareg: string[]
     inntektskomp: string[]
+    oppgave: string[]
+    dokarkiv: string[]
 }
 
 function prosseserApper(data: NaisApp[]): TabellApp[] {
@@ -168,6 +188,8 @@ function prosseserApper(data: NaisApp[]): TabellApp[] {
             pdl: pdlData,
             aareg: aaregData,
             inntektskomp: inntektskomp,
+            oppgave: hentDataFor('oppgave'),
+            dokarkiv: hentDataFor('dokarkiv'),
         })
     })
     return tabellApper
