@@ -45,7 +45,7 @@
         "@navikt/eslint-config-teamsykmelding": "^7.1.0",
         "@types/uuid": "^9.0.8",
         "eslint": "8.57.1",
-        "eslint-config-next": "15.3.5"
+        "eslint-config-next": "15.4.3"
     },
     "eslintConfig": {
         "extends": [
