@@ -21,7 +21,7 @@
         "@google-cloud/bigquery": "^7.9.4",
         "@navikt/aksel-icons": "^7.33.5",
         "@navikt/ds-css": "^7.35.0",
-        "@navikt/ds-react": "^7.34.0",
+        "@navikt/ds-react": "^7.35.0",
         "@navikt/ds-tailwind": "^7.34.0",
         "@navikt/ds-tokens": "^7.35.0",
         "@navikt/next-logger": "^1.35.0",
