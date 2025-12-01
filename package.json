@@ -23,7 +23,7 @@
         "@navikt/ds-css": "^7.35.0",
         "@navikt/ds-react": "^7.34.0",
         "@navikt/ds-tailwind": "^7.34.0",
-        "@navikt/ds-tokens": "^7.33.3",
+        "@navikt/ds-tokens": "^7.35.0",
         "@navikt/next-logger": "^1.35.0",
         "@navikt/oasis": "^3.8.0",
         "@tanstack/react-query": "^5.90.10",
