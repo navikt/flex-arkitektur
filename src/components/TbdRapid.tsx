@@ -1,7 +1,7 @@
 'use client'
 import React, { ReactElement, useCallback, useMemo, useState } from 'react'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { Alert, Button, Chips, Loader, Radio, RadioGroup, UNSAFE_Combobox } from '@navikt/ds-react'
+import { Alert, Button, Chips, Loader, Radio, RadioGroup, Switch, UNSAFE_Combobox } from '@navikt/ds-react'
 import { EyeSlashIcon, ExpandIcon, ShrinkIcon } from '@navikt/aksel-icons'
 
 import { useTbdRapidData } from '@/hooks/useTbdRapidData'
@@ -21,6 +21,7 @@ export const TbdRapid = (): ReactElement => {
         'ekskludert',
         parseAsArrayOf(parseAsString).withDefault(['ping']),
     )
+    const [inkluderNaboer, setInkluderNaboer] = useQueryState('naboer', parseAsBoolean.withDefault(true))
     const [ekskluderModus, setEkskluderModus] = useState(false)
     const [appFilter, setAppFilter] = useState('')
     const [eventFilter, setEventFilter] = useState('')
@@ -80,14 +81,21 @@ export const TbdRapid = (): ReactElement => {
 
     // Kalkuler filtrerte noder og kanter for grafen
     const noderOgKanter = useMemo(() => {
-        const filtrerte = filtrerRapidNoder(rapidNoder, sokemetode, valgteApper, valgteEvents, ekskluderteEvents)
+        const filtrerte = filtrerRapidNoder(
+            rapidNoder,
+            sokemetode,
+            valgteApper,
+            valgteEvents,
+            ekskluderteEvents,
+            inkluderNaboer,
+        )
         return kalkulerRapidNoderOgKanter({
             filtrerteNoder: filtrerte,
             sokemetode,
             valgteEvents,
             ekskluderteEvents,
         })
-    }, [rapidNoder, sokemetode, valgteApper, valgteEvents, ekskluderteEvents])
+    }, [rapidNoder, sokemetode, valgteApper, valgteEvents, ekskluderteEvents, inkluderNaboer])
 
     if (error) {
         return (
@@ -159,7 +167,16 @@ export const TbdRapid = (): ReactElement => {
                                 }}
                             />
                         )}
-                        <div className="self-end flex">
+                        <div className="self-end flex items-center gap-2">
+                            {sokemetode === 'app' && valgteApper.length > 0 && (
+                                <Switch
+                                    size="small"
+                                    checked={inkluderNaboer}
+                                    onChange={(e) => setInkluderNaboer(e.target.checked)}
+                                >
+                                    Inkluder naboer
+                                </Switch>
+                            )}
                             {sokemetode === 'app' && (
                                 <Button
                                     variant={ekskluderModus ? 'primary' : 'secondary-neutral'}
@@ -227,9 +244,7 @@ export const TbdRapid = (): ReactElement => {
                                         <Chips.Removable
                                             key={event}
                                             onDelete={() => {
-                                                setEkskluderteEvents(
-                                                    ekskluderteEvents.filter((o) => o !== event),
-                                                )
+                                                setEkskluderteEvents(ekskluderteEvents.filter((o) => o !== event))
                                             }}
                                             className="bg-red-100"
                                         >

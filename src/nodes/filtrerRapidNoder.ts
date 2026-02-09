@@ -6,12 +6,19 @@ export function filtrerRapidNoder(
     valgteApper: string[],
     valgteEvents: string[],
     ekskluderteEvents: string[] = [],
+    inkluderNaboer: boolean = true,
 ): RapidNode[] {
     const ekskluderteEventSet = new Set(ekskluderteEvents)
 
     if (sokemetode === 'app' && valgteApper.length > 0) {
-        // Finn valgte noder og alle noder som er koblet til dem via events
         const valgteNoderIds = new Set(valgteApper)
+
+        if (!inkluderNaboer) {
+            // Bare vis de valgte appene, ingen naboer
+            return noder.filter((node) => valgteNoderIds.has(node.id))
+        }
+
+        // Finn valgte noder og alle noder som er koblet til dem via events
         const relatertNoderIds = new Set<string>()
 
         noder.forEach((node) => {

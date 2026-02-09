@@ -10,7 +10,6 @@ export interface NaisApp {
     write_topics?: string[]
 }
 
-
 export interface TbdRapidData {
     producers: RapidEvent[]
     consumers: RapidEvent[]
