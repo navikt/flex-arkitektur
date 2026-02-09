@@ -9,3 +9,14 @@ export interface NaisApp {
     read_topics?: string[]
     write_topics?: string[]
 }
+
+export interface TbdRapidData {
+    producers: RapidEvent[]
+    consumers: RapidEvent[]
+}
+
+export interface RapidEvent {
+    app: string
+    namespace: string
+    event_name: string
+}
