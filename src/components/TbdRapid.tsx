@@ -71,9 +71,10 @@ export const TbdRapid = (): ReactElement => {
 
     // Callback for å ekskludere event ved klikk på kant
     const onEdgeClick = useCallback(
-        (eventName: string) => {
-            if (!ekskluderteEvents.includes(eventName)) {
-                setEkskluderteEvents([...ekskluderteEvents, eventName])
+        (eventNames: string[]) => {
+            const nyeEkskluderte = eventNames.filter((e) => !ekskluderteEvents.includes(e))
+            if (nyeEkskluderte.length > 0) {
+                setEkskluderteEvents([...ekskluderteEvents, ...nyeEkskluderte])
             }
         },
         [ekskluderteEvents, setEkskluderteEvents],
@@ -94,6 +95,7 @@ export const TbdRapid = (): ReactElement => {
             sokemetode,
             valgteEvents,
             ekskluderteEvents,
+            maxChars: 50,
         })
     }, [rapidNoder, sokemetode, valgteApper, valgteEvents, ekskluderteEvents, inkluderNaboer])
 
