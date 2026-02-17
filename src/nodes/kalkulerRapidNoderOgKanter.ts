@@ -140,24 +140,33 @@ export function kalkulerRapidNoderOgKanter({
         })
     })
 
-    // Vis alle filtrerte noder, selv de uten kanter
+    // Finn noder som har minst én kant
+    const nodesWithEdges = new Set<string>()
+    edgeMap.forEach((entry) => {
+        nodesWithEdges.add(entry.from)
+        nodesWithEdges.add(entry.to)
+    })
+
+    // Vis bare noder som har kanter
     filtrerteNoder.forEach((node) => {
-        data.nodes.push({
-            id: node.id,
-            label: node.navn,
-            shape: 'box',
-            margin: {
-                top: 20,
-                bottom: 20,
-                left: 10,
-                right: 10,
-            },
-            group: node.namespace,
-            font: {
-                face: 'monospace',
-                align: 'center',
-            },
-        })
+        if (nodesWithEdges.has(node.id)) {
+            data.nodes.push({
+                id: node.id,
+                label: node.navn,
+                shape: 'box',
+                margin: {
+                    top: 20,
+                    bottom: 20,
+                    left: 10,
+                    right: 10,
+                },
+                group: node.namespace,
+                font: {
+                    face: 'monospace',
+                    align: 'center',
+                },
+            })
+        }
     })
 
     // Konverter samlet edge map til edges

@@ -28,12 +28,20 @@ export const TbdRapid = (): ReactElement => {
         return kalkulerRapidNoder(data)
     }, [data])
 
-    // Hent unike app-navn fra kalkulerte noder (ikke rådata)
+    // Hent unike app-navn fra kalkulerte noder (bare de med relasjoner)
     const alleApper = useMemo(() => {
         if (!rapidNoder || rapidNoder.length === 0) return []
         const appSet = new Set<string>()
         rapidNoder.forEach((node) => {
-            appSet.add(node.id)
+            // Bare inkluder noder som har minst én relasjon
+            const harRelasjoner =
+                node.produceEvents.size > 0 ||
+                node.consumeEvents.size > 0 ||
+                node.sendBehov.size > 0 ||
+                node.sendLosning.size > 0
+            if (harRelasjoner) {
+                appSet.add(node.id)
+            }
         })
         return Array.from(appSet).sort()
     }, [rapidNoder])
