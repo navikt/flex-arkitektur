@@ -109,6 +109,35 @@ export function kalkulerRapidNoderOgKanter({
                 }
             })
         })
+
+        // Samle events per kant-par (source -> target) for consumeEvents (motsatt retning)
+        node.consumeEvents.forEach((producers, eventName) => {
+            // Filtrer events hvis event-filter er aktivt
+            if (valgteEventSet && !valgteEventSet.has(eventName)) return
+
+            // Ekskluder events som er i ekskludert-listen
+            if (ekskluderteEventSet.has(eventName)) return
+
+            producers.forEach((producer) => {
+                // Bare samle kanter til noder som finnes i filtrerte noder
+                if (!nodeIds.has(producer.id)) return
+
+                const edgeKey = `${producer.id}->${node.id}`
+                if (!edgeMap.has(edgeKey)) {
+                    edgeMap.set(edgeKey, {
+                        events: [],
+                        from: producer.id,
+                        to: node.id,
+                        fromName: nodeNavnMap.get(producer.id) || producer.id,
+                        toName: node.navn,
+                    })
+                }
+                const entry = edgeMap.get(edgeKey)!
+                if (!entry.events.includes(eventName)) {
+                    entry.events.push(eventName)
+                }
+            })
+        })
     })
 
     // Vis alle filtrerte noder, selv de uten kanter
