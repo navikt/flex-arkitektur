@@ -40,7 +40,7 @@ export function kalkulerRapidNoder(data: PrometheusResponse): RapidNode[] {
 
     // Bygg relasjoner
     data.data.result.forEach((item) => {
-        const { app, namespace, event_name, participating_services, losninger } = item.metric
+        const { app, namespace, event_name, participating_services, losninger, behov } = item.metric
 
         // Spesialbehandling for behov events med behovsakkumulator
         if (event_name === 'behov' && app === 'behovsakkumulator' && participating_services) {
@@ -63,6 +63,27 @@ export function kalkulerRapidNoder(data: PrometheusResponse): RapidNode[] {
                         // Løsning: toNode sender løsning til fromNode
                         toNode.sendLosning.set(losning, fromNode)
                     })
+                }
+            }
+        } else if (behov === 'none' && participating_services) {
+            // Events som ikke er behov: første app sender til siste app
+            const services = participating_services.split(',').map((s) => s.trim())
+            if (services.length >= 2) {
+                const fromApp = services[0]
+                const toApp = services[services.length - 1]
+                const fromNode = nodeMap.get(`${namespace}.${fromApp}`)
+                const toNode = nodeMap.get(`${namespace}.${toApp}`)
+
+                if (fromNode && toNode && fromNode !== toNode) {
+                    if (!fromNode.produceEvents.has(event_name)) {
+                        fromNode.produceEvents.set(event_name, new Set())
+                    }
+                    fromNode.produceEvents.get(event_name)!.add(toNode)
+
+                    if (!toNode.consumeEvents.has(event_name)) {
+                        toNode.consumeEvents.set(event_name, new Set())
+                    }
+                    toNode.consumeEvents.get(event_name)!.add(fromNode)
                 }
             }
         } else {
