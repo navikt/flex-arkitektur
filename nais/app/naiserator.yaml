@@ -54,4 +54,4 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: https://prometheus.prod.nav.cloud.nais.io
+        - host: prometheus.prod.nav.cloud.nais.io

@@ -20,3 +20,22 @@ export interface RapidEvent {
     namespace: string
     event_name: string
 }
+
+export interface PrometheusResponse {
+    status: string
+    data: {
+        resultType: string
+        result: Array<{
+            metric: {
+                app: string
+                behov: string
+                losninger: string
+                participating_services: string
+                namespace: string
+                event_name: string
+                river?: string
+            }
+            value: [number, string]
+        }>
+    }
+}
