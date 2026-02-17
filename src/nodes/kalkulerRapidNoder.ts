@@ -18,8 +18,25 @@ export class RapidNode {
 export function kalkulerRapidNoder(data: PrometheusResponse): RapidNode[] {
     const nodeMap = new Map<string, RapidNode>()
 
+    // Filtrer ut ugyldige events
+    const filtrerteResults = data.data.result.filter((item) => {
+        const { behov, losninger, participating_services } = item.metric
+
+        // Ekskluder hvis participating_services er "none" eller ikke satt
+        if (!participating_services || participating_services === 'none') {
+            return false
+        }
+
+        // Ekskluder hvis behov er "none" eller ikke satt, OG løsninger er satt
+        if ((!behov || behov === 'none') && losninger && losninger !== 'none') {
+            return false
+        }
+
+        return true
+    })
+
     // Opprett noder for alle unike apper fra Prometheus data
-    data.data.result.forEach((item) => {
+    filtrerteResults.forEach((item) => {
         const { app, namespace } = item.metric
         const id = `${namespace}.${app}`
         if (!nodeMap.has(id)) {
@@ -39,7 +56,7 @@ export function kalkulerRapidNoder(data: PrometheusResponse): RapidNode[] {
     })
 
     // Bygg relasjoner
-    data.data.result.forEach((item) => {
+    filtrerteResults.forEach((item) => {
         const { app, namespace, event_name, participating_services, losninger, behov } = item.metric
 
         // Spesialbehandling for behov events med behovsakkumulator
@@ -92,7 +109,7 @@ export function kalkulerRapidNoder(data: PrometheusResponse): RapidNode[] {
             if (!producerNode) return
 
             // Finn alle konsumenter av dette eventet
-            data.data.result.forEach((consumerItem) => {
+            filtrerteResults.forEach((consumerItem) => {
                 if (
                     consumerItem.metric.event_name === event_name &&
                     consumerItem.metric.app !== app &&
