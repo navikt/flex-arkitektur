@@ -38,25 +38,25 @@ export const TbdRapid = (): ReactElement => {
         return Array.from(appSet).sort()
     }, [rapidNoder])
 
-    // Hent unike event-navn fra API data
+    // Hent unike event-navn fra beregnede noder (kun events med faktiske relasjoner)
     const alleEvents = useMemo(() => {
-        if (!data) return []
         const eventSet = new Set<string>()
-        data.data.result.forEach((item) => {
-            const { event_name, app, losninger } = item.metric
-
-            // For behov med behovsakkumulator, legg til behov-X og løsning-X events
-            if (event_name === 'behov' && app === 'behovsakkumulator' && losninger && losninger !== 'none') {
-                losninger.split(',').forEach((losning) => {
-                    eventSet.add(`behov-${losning.trim()}`)
-                    eventSet.add(`løsning-${losning.trim()}`)
-                })
-            } else {
-                eventSet.add(event_name)
-            }
+        rapidNoder.forEach((node) => {
+            // Events som produseres
+            node.produceEvents.forEach((_, eventName) => {
+                if (eventName !== 'ping') eventSet.add(eventName)
+            })
+            // Events som konsumeres
+            node.consumeEvents.forEach((_, eventName) => {
+                if (eventName !== 'ping') eventSet.add(eventName)
+            })
+            // Behov som sendes
+            node.sendBehov.forEach((_, losning) => {
+                eventSet.add(`behov-${losning}`)
+            })
         })
         return Array.from(eventSet).sort()
-    }, [data])
+    }, [rapidNoder])
 
     // Filtrer app-liste basert på søketekst
     const filtrerteApperForCombobox = useMemo(() => {

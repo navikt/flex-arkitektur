@@ -44,20 +44,43 @@ export function filtrerRapidNoder(
 
     if (sokemetode === 'event' && valgteEvents.length > 0) {
         const valgteEventSet = new Set(valgteEvents)
+        const relatertNoderIds = new Set<string>()
 
-        return noder.filter((node) => {
+        noder.forEach((node) => {
             // Sjekk om noden produserer noen av de valgte eventene
-            for (const eventName of node.produceEvents.keys()) {
-                if (valgteEventSet.has(eventName)) return true
+            for (const [eventName, consumers] of node.produceEvents.entries()) {
+                if (valgteEventSet.has(eventName)) {
+                    relatertNoderIds.add(node.id) // Inkluder producer
+                    consumers.forEach((consumer) => relatertNoderIds.add(consumer.id)) // Inkluder alle consumers
+                }
             }
 
             // Sjekk om noden konsumerer noen av de valgte eventene
-            for (const eventName of node.consumeEvents.keys()) {
-                if (valgteEventSet.has(eventName)) return true
+            for (const [eventName, producers] of node.consumeEvents.entries()) {
+                if (valgteEventSet.has(eventName)) {
+                    relatertNoderIds.add(node.id) // Inkluder consumer
+                    producers.forEach((producer) => relatertNoderIds.add(producer.id)) // Inkluder alle producers
+                }
             }
 
-            return false
+            // Sjekk om noden sender behov (behov-X events)
+            for (const [losning, targetNode] of node.sendBehov.entries()) {
+                if (valgteEventSet.has(`behov-${losning}`)) {
+                    relatertNoderIds.add(node.id) // Inkluder sender
+                    relatertNoderIds.add(targetNode.id) // Inkluder mottaker
+                }
+            }
+
+            // Sjekk om noden sender løsning (løsning-X events)
+            for (const [losning, targetNodes] of node.sendLosning.entries()) {
+                if (valgteEventSet.has(`løsning-${losning}`)) {
+                    relatertNoderIds.add(node.id) // Inkluder sender
+                    targetNodes.forEach((targetNode) => relatertNoderIds.add(targetNode.id)) // Inkluder alle mottakere
+                }
+            }
         })
+
+        return noder.filter((node) => relatertNoderIds.has(node.id))
     }
 
     // Ingen filter satt - vis alle
