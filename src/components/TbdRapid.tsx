@@ -1,8 +1,8 @@
 'use client'
-import React, { ReactElement, useCallback, useMemo, useState } from 'react'
+import React, { ReactElement, useMemo, useState } from 'react'
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { Alert, Button, Chips, Loader, Radio, RadioGroup, Switch, UNSAFE_Combobox } from '@navikt/ds-react'
-import { EyeSlashIcon, ExpandIcon, ShrinkIcon } from '@navikt/aksel-icons'
+import { ExpandIcon, ShrinkIcon } from '@navikt/aksel-icons'
 
 import { useTbdRapidData } from '@/hooks/useTbdRapidData'
 import { kalkulerRapidNoder, RapidNode } from '@/nodes/kalkulerRapidNoder'
@@ -17,12 +17,7 @@ export const TbdRapid = (): ReactElement => {
     const [fullscreen, setFullscreen] = useQueryState('fullscreen', parseAsBoolean.withDefault(false))
     const [valgteApper, setApper] = useQueryState('apper', parseAsArrayOf(parseAsString).withDefault([]))
     const [valgteEvents, setEvents] = useQueryState('events', parseAsArrayOf(parseAsString).withDefault([]))
-    const [ekskluderteEvents, setEkskluderteEvents] = useQueryState(
-        'ekskludert',
-        parseAsArrayOf(parseAsString).withDefault(['ping']),
-    )
     const [inkluderNaboer, setInkluderNaboer] = useQueryState('naboer', parseAsBoolean.withDefault(true))
-    const [ekskluderModus, setEkskluderModus] = useState(false)
     const [appFilter, setAppFilter] = useState('')
     const [eventFilter, setEventFilter] = useState('')
 
@@ -85,35 +80,16 @@ export const TbdRapid = (): ReactElement => {
         )
     }, [alleEvents, eventFilter, valgteEvents])
 
-    // Callback for å ekskludere event ved klikk på kant
-    const onEdgeClick = useCallback(
-        (eventNames: string[]) => {
-            const nyeEkskluderte = eventNames.filter((e) => !ekskluderteEvents.includes(e))
-            if (nyeEkskluderte.length > 0) {
-                setEkskluderteEvents([...ekskluderteEvents, ...nyeEkskluderte])
-            }
-        },
-        [ekskluderteEvents, setEkskluderteEvents],
-    )
-
     // Kalkuler filtrerte noder og kanter for grafen
     const noderOgKanter = useMemo(() => {
-        const filtrerte = filtrerRapidNoder(
-            rapidNoder,
-            sokemetode,
-            valgteApper,
-            valgteEvents,
-            ekskluderteEvents,
-            inkluderNaboer,
-        )
+        const filtrerte = filtrerRapidNoder(rapidNoder, sokemetode, valgteApper, valgteEvents, inkluderNaboer)
         return kalkulerRapidNoderOgKanter({
             filtrerteNoder: filtrerte,
             sokemetode,
             valgteEvents,
-            ekskluderteEvents,
             maxChars: 50,
         })
-    }, [rapidNoder, sokemetode, valgteApper, valgteEvents, ekskluderteEvents, inkluderNaboer])
+    }, [rapidNoder, sokemetode, valgteApper, valgteEvents, inkluderNaboer])
 
     if (error) {
         return (
@@ -195,16 +171,6 @@ export const TbdRapid = (): ReactElement => {
                                     Inkluder naboer
                                 </Switch>
                             )}
-                            {sokemetode === 'app' && (
-                                <Button
-                                    variant={ekskluderModus ? 'primary' : 'secondary-neutral'}
-                                    className="mr-2"
-                                    onClick={() => setEkskluderModus(!ekskluderModus)}
-                                    icon={<EyeSlashIcon title="Ekskluder events" />}
-                                >
-                                    Ekskluder events
-                                </Button>
-                            )}
                             <Button
                                 variant="secondary-neutral"
                                 className="mr-2"
@@ -253,26 +219,6 @@ export const TbdRapid = (): ReactElement => {
                             </Chips>
                         </div>
                     )}
-                    {sokemetode === 'app' && ekskluderteEvents.length > 0 && (
-                        <div className="mt-2">
-                            <span className="text-sm font-semibold mr-2">Ekskluderte events:</span>
-                            <Chips>
-                                {ekskluderteEvents.map((event) => {
-                                    return (
-                                        <Chips.Removable
-                                            key={event}
-                                            onDelete={() => {
-                                                setEkskluderteEvents(ekskluderteEvents.filter((o) => o !== event))
-                                            }}
-                                            className="bg-red-100"
-                                        >
-                                            {event}
-                                        </Chips.Removable>
-                                    )
-                                })}
-                            </Chips>
-                        </div>
-                    )}
                 </div>
             )}
             {isFetching && (
@@ -282,29 +228,7 @@ export const TbdRapid = (): ReactElement => {
                     </div>
                 </div>
             )}
-            {!isFetching && (
-                <RapidGraph
-                    data={noderOgKanter}
-                    fullscreen={fullscreen}
-                    brukFysikk={brukFysikk}
-                    ekskluderModus={ekskluderModus}
-                    onEdgeClick={onEdgeClick}
-                />
-            )}
-            {ekskluderModus && (
-                <div className="fixed bottom-10 left-0 m-10 bg-gray-100 p-5 rounded">
-                    <Alert variant="info">Klikk på kanter for å ekskludere event-navn fra visningen.</Alert>
-                    <Button
-                        className="mt-2"
-                        variant="primary"
-                        onClick={() => {
-                            setEkskluderModus(false)
-                        }}
-                    >
-                        Ferdig
-                    </Button>
-                </div>
-            )}
+            {!isFetching && <RapidGraph data={noderOgKanter} fullscreen={fullscreen} brukFysikk={brukFysikk} />}
         </>
     )
 }

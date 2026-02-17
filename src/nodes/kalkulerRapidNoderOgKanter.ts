@@ -18,7 +18,6 @@ interface KalkulasjonOptions {
     filtrerteNoder: RapidNode[]
     sokemetode: string
     valgteEvents: string[]
-    ekskluderteEvents: string[]
     maxChars?: number
 }
 
@@ -32,7 +31,6 @@ export function kalkulerRapidNoderOgKanter({
     filtrerteNoder,
     sokemetode,
     valgteEvents,
-    ekskluderteEvents,
     maxChars,
 }: KalkulasjonOptions): NoderOgKanter {
     const data: NoderOgKanter = {
@@ -53,26 +51,9 @@ export function kalkulerRapidNoderOgKanter({
 
     // Event filter for å begrense hvilke kanter som vises
     const valgteEventSet = sokemetode === 'event' && valgteEvents.length > 0 ? new Set(valgteEvents) : null
-    const ekskluderteEventSet = new Set(ekskluderteEvents)
+    const ekskluderteEventSet = new Set(['ping'])
 
     filtrerteNoder.forEach((node) => {
-        data.nodes.push({
-            id: node.id,
-            label: node.navn,
-            shape: 'box',
-            margin: {
-                top: 20,
-                bottom: 20,
-                left: 10,
-                right: 10,
-            },
-            group: node.namespace,
-            font: {
-                face: 'monospace',
-                align: 'center',
-            },
-        })
-
         // Håndter behov-piler
         node.sendBehov.forEach((targetNode, losning) => {
             const behovEventName = `behov-${losning}`
@@ -96,33 +77,6 @@ export function kalkulerRapidNoderOgKanter({
                 const behovEntry = edgeMap.get(behovEdgeKey)!
                 if (!behovEntry.events.includes(behovEventName)) {
                     behovEntry.events.push(behovEventName)
-                }
-            }
-        })
-
-        // Håndter løsning-piler
-        node.sendLosning.forEach((targetNode, losning) => {
-            const losningEventName = `løsning-${losning}`
-
-            // Filtrer hvis event-filter er aktivt
-            if (valgteEventSet && !valgteEventSet.has(losningEventName)) return
-            if (ekskluderteEventSet.has(losningEventName)) return
-
-            // Løsning-pil: fra node -> til targetNode
-            if (nodeIds.has(targetNode.id)) {
-                const losningEdgeKey = `${node.id}->${targetNode.id}`
-                if (!edgeMap.has(losningEdgeKey)) {
-                    edgeMap.set(losningEdgeKey, {
-                        events: [],
-                        from: node.id,
-                        to: targetNode.id,
-                        fromName: node.navn,
-                        toName: nodeNavnMap.get(targetNode.id) || targetNode.id,
-                    })
-                }
-                const losningEntry = edgeMap.get(losningEdgeKey)!
-                if (!losningEntry.events.includes(losningEventName)) {
-                    losningEntry.events.push(losningEventName)
                 }
             }
         })
@@ -155,6 +109,34 @@ export function kalkulerRapidNoderOgKanter({
                 }
             })
         })
+    })
+
+    // Filtrer bort noder som ikke har noen kanter
+    const noderMedKanter = new Set<string>()
+    edgeMap.forEach((entry) => {
+        noderMedKanter.add(entry.from)
+        noderMedKanter.add(entry.to)
+    })
+
+    filtrerteNoder.forEach((node) => {
+        if (noderMedKanter.has(node.id)) {
+            data.nodes.push({
+                id: node.id,
+                label: node.navn,
+                shape: 'box',
+                margin: {
+                    top: 20,
+                    bottom: 20,
+                    left: 10,
+                    right: 10,
+                },
+                group: node.namespace,
+                font: {
+                    face: 'monospace',
+                    align: 'center',
+                },
+            })
+        }
     })
 
     // Konverter samlet edge map til edges

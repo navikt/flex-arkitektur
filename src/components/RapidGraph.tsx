@@ -17,14 +17,10 @@ export function RapidGraph({
     data,
     fullscreen,
     brukFysikk,
-    ekskluderModus,
-    onEdgeClick,
 }: {
     data: NoderOgKanter
     fullscreen: boolean
     brukFysikk: boolean
-    ekskluderModus: boolean
-    onEdgeClick?: (eventNames: string[]) => void
 }): ReactElement {
     const container = useRef<HTMLDivElement>(null)
     const forrigeNoder = useRef(new Set<string>())
@@ -144,28 +140,6 @@ export function RapidGraph({
             }, 20)
         }
     }, [data, brukFysikk])
-
-    // Håndter klikk på kanter for å ekskludere events
-    // VIKTIG: Denne effekten må komme ETTER network creation effekten,
-    // fordi React kjører effects i deklarasjonsrekkefølge.
-    // Når data endres recreates nettverket først, så attaches click handler til det nye nettverket.
-    useEffect(() => {
-        if (networkRef.current) {
-            if (ekskluderModus && onEdgeClick) {
-                networkRef.current.on('click', function (params) {
-                    if (params.edges.length > 0 && params.nodes.length === 0) {
-                        const edgeId = params.edges[0] as string
-                        const edge = data.edges.find((e) => e.id === edgeId) as RapidEdge | undefined
-                        if (edge?.events) {
-                            onEdgeClick(edge.events)
-                        }
-                    }
-                })
-            } else {
-                networkRef.current.off('click')
-            }
-        }
-    }, [ekskluderModus, onEdgeClick, data])
 
     const grupper = new Set<string>()
     data.nodes.forEach((node) => {

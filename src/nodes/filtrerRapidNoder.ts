@@ -5,10 +5,9 @@ export function filtrerRapidNoder(
     sokemetode: string,
     valgteApper: string[],
     valgteEvents: string[],
-    ekskluderteEvents: string[] = [],
     inkluderNaboer: boolean = true,
 ): RapidNode[] {
-    const ekskluderteEventSet = new Set(ekskluderteEvents)
+    const ekskluderteEventSet = new Set(['ping'])
 
     if (sokemetode === 'app' && valgteApper.length > 0) {
         const valgteNoderIds = new Set(valgteApper)
