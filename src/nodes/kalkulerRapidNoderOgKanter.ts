@@ -73,7 +73,61 @@ export function kalkulerRapidNoderOgKanter({
             },
         })
 
-        // Samle events per kant-par (source -> target)
+        // Håndter behov-piler
+        node.sendBehov.forEach((targetNode, losning) => {
+            const behovEventName = `behov-${losning}`
+
+            // Filtrer hvis event-filter er aktivt
+            if (valgteEventSet && !valgteEventSet.has(behovEventName)) return
+            if (ekskluderteEventSet.has(behovEventName)) return
+
+            // Behov-pil: fra node -> til targetNode
+            if (nodeIds.has(targetNode.id)) {
+                const behovEdgeKey = `${node.id}->${targetNode.id}`
+                if (!edgeMap.has(behovEdgeKey)) {
+                    edgeMap.set(behovEdgeKey, {
+                        events: [],
+                        from: node.id,
+                        to: targetNode.id,
+                        fromName: node.navn,
+                        toName: nodeNavnMap.get(targetNode.id) || targetNode.id,
+                    })
+                }
+                const behovEntry = edgeMap.get(behovEdgeKey)!
+                if (!behovEntry.events.includes(behovEventName)) {
+                    behovEntry.events.push(behovEventName)
+                }
+            }
+        })
+
+        // Håndter løsning-piler
+        node.sendLosning.forEach((targetNode, losning) => {
+            const losningEventName = `løsning-${losning}`
+
+            // Filtrer hvis event-filter er aktivt
+            if (valgteEventSet && !valgteEventSet.has(losningEventName)) return
+            if (ekskluderteEventSet.has(losningEventName)) return
+
+            // Løsning-pil: fra node -> til targetNode
+            if (nodeIds.has(targetNode.id)) {
+                const losningEdgeKey = `${node.id}->${targetNode.id}`
+                if (!edgeMap.has(losningEdgeKey)) {
+                    edgeMap.set(losningEdgeKey, {
+                        events: [],
+                        from: node.id,
+                        to: targetNode.id,
+                        fromName: node.navn,
+                        toName: nodeNavnMap.get(targetNode.id) || targetNode.id,
+                    })
+                }
+                const losningEntry = edgeMap.get(losningEdgeKey)!
+                if (!losningEntry.events.includes(losningEventName)) {
+                    losningEntry.events.push(losningEventName)
+                }
+            }
+        })
+
+        // Samle events per kant-par (source -> target) for vanlige events
         node.produceEvents.forEach((consumers, eventName) => {
             // Filtrer events hvis event-filter er aktivt
             if (valgteEventSet && !valgteEventSet.has(eventName)) return

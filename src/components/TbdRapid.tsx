@@ -37,8 +37,14 @@ export const TbdRapid = (): ReactElement => {
     const alleApper = useMemo(() => {
         if (!data) return []
         const appSet = new Set<string>()
-        ;[...data.producers, ...data.consumers].forEach((event) => {
-            appSet.add(`${event.namespace}.${event.app}`)
+        data.data.result.forEach((item) => {
+            const { app, namespace, participating_services } = item.metric
+            appSet.add(`${namespace}.${app}`)
+            if (participating_services) {
+                participating_services.split(',').forEach((service) => {
+                    appSet.add(`${namespace}.${service.trim()}`)
+                })
+            }
         })
         return Array.from(appSet).sort()
     }, [data])
@@ -47,8 +53,18 @@ export const TbdRapid = (): ReactElement => {
     const alleEvents = useMemo(() => {
         if (!data) return []
         const eventSet = new Set<string>()
-        ;[...data.producers, ...data.consumers].forEach((event) => {
-            eventSet.add(event.event_name)
+        data.data.result.forEach((item) => {
+            const { event_name, app, losninger } = item.metric
+
+            // For behov med behovsakkumulator, legg til behov-X og løsning-X events
+            if (event_name === 'behov' && app === 'behovsakkumulator' && losninger && losninger !== 'none') {
+                losninger.split(',').forEach((losning) => {
+                    eventSet.add(`behov-${losning.trim()}`)
+                    eventSet.add(`løsning-${losning.trim()}`)
+                })
+            } else {
+                eventSet.add(event_name)
+            }
         })
         return Array.from(eventSet).sort()
     }, [data])

@@ -1,8 +1,12 @@
-import { TbdRapidData } from '@/types'
+import { PrometheusResponse } from '@/types'
 
 export class RapidNode {
     public produceEvents = new Map<string, Set<RapidNode>>()
     public consumeEvents = new Map<string, Set<RapidNode>>()
+    // Behov: denne noden sender behov til target
+    public sendBehov = new Map<string, RapidNode>()
+    // Løsning: denne noden sender løsning til target
+    public sendLosning = new Map<string, RapidNode>()
 
     constructor(
         public id: string,
@@ -11,55 +15,90 @@ export class RapidNode {
     ) {}
 }
 
-export function kalkulerRapidNoder(data: TbdRapidData): RapidNode[] {
+export function kalkulerRapidNoder(data: PrometheusResponse): RapidNode[] {
     const nodeMap = new Map<string, RapidNode>()
 
-    // Opprett noder for alle unike apper fra producers og consumers
-    const alleEvents = [...data.producers, ...data.consumers]
-    alleEvents.forEach((event) => {
-        const id = `${event.namespace}.${event.app}`
+    // Opprett noder for alle unike apper fra Prometheus data
+    data.data.result.forEach((item) => {
+        const { app, namespace } = item.metric
+        const id = `${namespace}.${app}`
         if (!nodeMap.has(id)) {
-            nodeMap.set(id, new RapidNode(id, event.app, event.namespace))
+            nodeMap.set(id, new RapidNode(id, app, namespace))
+        }
+
+        // Håndter participating_services for å opprette alle noder
+        if (item.metric.participating_services) {
+            const services = item.metric.participating_services.split(',').map((s) => s.trim())
+            services.forEach((service) => {
+                const serviceId = `${namespace}.${service}`
+                if (!nodeMap.has(serviceId)) {
+                    nodeMap.set(serviceId, new RapidNode(serviceId, service, namespace))
+                }
+            })
         }
     })
 
-    // Bygg event_name -> producers map
-    const eventProducers = new Map<string, Set<RapidNode>>()
-    data.producers.forEach((event) => {
-        const id = `${event.namespace}.${event.app}`
-        const node = nodeMap.get(id)!
-        if (!eventProducers.has(event.event_name)) {
-            eventProducers.set(event.event_name, new Set())
-        }
-        eventProducers.get(event.event_name)!.add(node)
-    })
+    // Bygg relasjoner
+    data.data.result.forEach((item) => {
+        const { app, namespace, event_name, participating_services, losninger } = item.metric
 
-    // Bygg event_name -> consumers map
-    const eventConsumers = new Map<string, Set<RapidNode>>()
-    data.consumers.forEach((event) => {
-        const id = `${event.namespace}.${event.app}`
-        const node = nodeMap.get(id)!
-        if (!eventConsumers.has(event.event_name)) {
-            eventConsumers.set(event.event_name, new Set())
-        }
-        eventConsumers.get(event.event_name)!.add(node)
-    })
+        // Spesialbehandling for behov events med behovsakkumulator
+        if (event_name === 'behov' && app === 'behovsakkumulator' && participating_services) {
+            const services = participating_services.split(',').map((s) => s.trim())
+            const fromApp = services[0] // Første app sender behovet
+            const toApp = services[1] // Andre app mottar behovet og sender løsning
 
-    // Koble producers til consumers via event_name
-    data.producers.forEach((event) => {
-        const producerNode = nodeMap.get(`${event.namespace}.${event.app}`)!
-        const consumers = eventConsumers.get(event.event_name)
-        if (consumers) {
-            producerNode.produceEvents.set(event.event_name, consumers)
-        }
-    })
+            if (fromApp && toApp && losninger && losninger !== 'none') {
+                const fromNode = nodeMap.get(`${namespace}.${fromApp}`)
+                const toNode = nodeMap.get(`${namespace}.${toApp}`)
 
-    // Koble consumers til producers via event_name
-    data.consumers.forEach((event) => {
-        const consumerNode = nodeMap.get(`${event.namespace}.${event.app}`)!
-        const producers = eventProducers.get(event.event_name)
-        if (producers) {
-            consumerNode.consumeEvents.set(event.event_name, producers)
+                if (fromNode && toNode) {
+                    const losningListe = losninger.split(',').map((l) => l.trim())
+
+                    // For hver løsning, opprett behov/løsning relasjoner
+                    losningListe.forEach((losning) => {
+                        // Behov: fromNode sender behov til toNode
+                        fromNode.sendBehov.set(losning, toNode)
+
+                        // Løsning: toNode sender løsning til fromNode
+                        toNode.sendLosning.set(losning, fromNode)
+                    })
+                }
+            }
+        } else {
+            // Standard event håndtering (ikke behov)
+            const producerNode = nodeMap.get(`${namespace}.${app}`)
+            if (!producerNode) return
+
+            // Finn alle konsumenter av dette eventet
+            data.data.result.forEach((consumerItem) => {
+                if (
+                    consumerItem.metric.event_name === event_name &&
+                    consumerItem.metric.app !== app &&
+                    consumerItem.metric.participating_services
+                ) {
+                    const consumerServices = consumerItem.metric.participating_services.split(',').map((s) => s.trim())
+                    if (consumerServices.includes(app)) {
+                        // Dette er en konsument av eventet
+                        consumerServices.forEach((service) => {
+                            if (service !== app) {
+                                const consumerNode = nodeMap.get(`${namespace}.${service}`)
+                                if (consumerNode) {
+                                    if (!producerNode.produceEvents.has(event_name)) {
+                                        producerNode.produceEvents.set(event_name, new Set())
+                                    }
+                                    producerNode.produceEvents.get(event_name)!.add(consumerNode)
+
+                                    if (!consumerNode.consumeEvents.has(event_name)) {
+                                        consumerNode.consumeEvents.set(event_name, new Set())
+                                    }
+                                    consumerNode.consumeEvents.get(event_name)!.add(producerNode)
+                                }
+                            }
+                        })
+                    }
+                }
+            })
         }
     })
 

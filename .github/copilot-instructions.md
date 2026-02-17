@@ -90,6 +90,7 @@ When working with graph node/edge calculations:
 ### Environment Setup
 
 For BigQuery access:
+
 ```bash
 # Authenticate with gcloud
 gcloud auth application-default login
@@ -100,6 +101,7 @@ GOOGLE_CLOUD_PROJECT=flex-dev  # or another project where you have BigQuery acce
 ```
 
 For local testdata (no BigQuery required):
+
 ```bash
 npm run local  # Sets LOCAL_TESTDATA=true
 ```
@@ -126,6 +128,7 @@ kubectl get app -n <namespace> -o json | jq '[.items[] | {appName: .metadata.nam
 ## Graph Visualization Options
 
 The Arkitektur component supports these toggles:
+
 - **visKafka**: Show Kafka topic relationships
 - **visSynkroneAppKall**: Show synchronous app-to-app calls
 - **visEksterneKall**: Show calls to external hosts
@@ -136,6 +139,7 @@ The Arkitektur component supports these toggles:
 ## Testing Changes
 
 No automated tests exist. Verify changes by:
+
 1. Running `npm run local` to test with local testdata
 2. Checking TypeScript compilation with `npm run tsc`
 3. Running linter with `npm run lint`
