@@ -51,3 +51,7 @@ spec:
     bigQueryDatasets:
       - name: flex_arkitektur_dataset
         permission: READWRITE
+  accessPolicy:
+    outbound:
+      external:
+        - host: https://prometheus.prod.nav.cloud.nais.io
