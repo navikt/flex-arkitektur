@@ -111,32 +111,24 @@ export function kalkulerRapidNoderOgKanter({
         })
     })
 
-    // Filtrer bort noder som ikke har noen kanter
-    const noderMedKanter = new Set<string>()
-    edgeMap.forEach((entry) => {
-        noderMedKanter.add(entry.from)
-        noderMedKanter.add(entry.to)
-    })
-
+    // Vis alle filtrerte noder, selv de uten kanter
     filtrerteNoder.forEach((node) => {
-        if (noderMedKanter.has(node.id)) {
-            data.nodes.push({
-                id: node.id,
-                label: node.navn,
-                shape: 'box',
-                margin: {
-                    top: 20,
-                    bottom: 20,
-                    left: 10,
-                    right: 10,
-                },
-                group: node.namespace,
-                font: {
-                    face: 'monospace',
-                    align: 'center',
-                },
-            })
-        }
+        data.nodes.push({
+            id: node.id,
+            label: node.navn,
+            shape: 'box',
+            margin: {
+                top: 20,
+                bottom: 20,
+                left: 10,
+                right: 10,
+            },
+            group: node.namespace,
+            font: {
+                face: 'monospace',
+                align: 'center',
+            },
+        })
     })
 
     // Konverter samlet edge map til edges

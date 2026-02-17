@@ -28,21 +28,15 @@ export const TbdRapid = (): ReactElement => {
         return kalkulerRapidNoder(data)
     }, [data])
 
-    // Hent unike app-navn fra API data
+    // Hent unike app-navn fra kalkulerte noder (ikke rådata)
     const alleApper = useMemo(() => {
-        if (!data) return []
+        if (!rapidNoder || rapidNoder.length === 0) return []
         const appSet = new Set<string>()
-        data.data.result.forEach((item) => {
-            const { app, namespace, participating_services } = item.metric
-            appSet.add(`${namespace}.${app}`)
-            if (participating_services) {
-                participating_services.split(',').forEach((service) => {
-                    appSet.add(`${namespace}.${service.trim()}`)
-                })
-            }
+        rapidNoder.forEach((node) => {
+            appSet.add(node.id)
         })
         return Array.from(appSet).sort()
-    }, [data])
+    }, [rapidNoder])
 
     // Hent unike event-navn fra API data
     const alleEvents = useMemo(() => {
