@@ -20,7 +20,7 @@ export function kalkulerRapidNoder(data: PrometheusResponse): RapidNode[] {
 
     // Filtrer ut ugyldige events
     const filtrerteResults = data.data.result.filter((item) => {
-        const { behov, losninger, participating_services } = item.metric
+        const { behov, losninger, participating_services, app, event_name } = item.metric
 
         // Ekskluder hvis participating_services er "none" eller ikke satt
         if (!participating_services || participating_services === 'none') {
@@ -29,6 +29,11 @@ export function kalkulerRapidNoder(data: PrometheusResponse): RapidNode[] {
 
         // Ekskluder hvis behov er "none" eller ikke satt, OG løsninger er satt
         if ((!behov || behov === 'none') && losninger && losninger !== 'none') {
+            return false
+        }
+
+        // Ekskluder behov events fra apper som ikke er behovsakkumulator
+        if (event_name === 'behov' && app !== 'behovsakkumulator') {
             return false
         }
 
