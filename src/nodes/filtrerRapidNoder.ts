@@ -72,10 +72,10 @@ export function filtrerRapidNoder(
             }
 
             // Sjekk om noden sender løsning (løsning-X events)
-            for (const [losning, targetNodes] of node.sendLosning.entries()) {
+            for (const [losning, targetNode] of node.sendLosning.entries()) {
                 if (valgteEventSet.has(`løsning-${losning}`)) {
                     relatertNoderIds.add(node.id) // Inkluder sender
-                    targetNodes.forEach((targetNode) => relatertNoderIds.add(targetNode.id)) // Inkluder alle mottakere
+                    relatertNoderIds.add(targetNode.id) // Inkluder mottaker
                 }
             }
         })
