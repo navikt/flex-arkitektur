@@ -1,4 +1,7 @@
 # flex arkitektur
+Henter apper og tilhørende databaser fra bigquery.
+Henter også metrikker fra prometheus for tbd-rapid data.
+
 
 ## Kjøre mot bigquery lokalt
 
