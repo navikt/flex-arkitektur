@@ -28,7 +28,7 @@ async function fetchConsumersFromPrometheus(): Promise<PrometheusResponse> {
 
 async function getPrometheusData(): Promise<PrometheusResponse> {
     const currentTime = Date.now()
-    const cacheTimer = 6 // 6 hours like naisapper
+    const cacheTimer = 0.5 // halvtime
 
     // Use test data in local development
     if (isLocalOrDemo && process.env.LOCAL_TESTDATA === 'true') {
@@ -52,10 +52,7 @@ export async function GET(): Promise<NextResponse<PrometheusResponse | { error: 
     try {
         const data = await getPrometheusData()
 
-        const nextResponse = NextResponse.json(data)
-        nextResponse.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=300')
-
-        return nextResponse
+        return NextResponse.json(data)
     } catch (error) {
         logger.error(`Error in tbd-rapid API: ${error}`)
         return NextResponse.json({ error: 'Failed to fetch rapid data' }, { status: 500 })
