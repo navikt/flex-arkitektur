@@ -18,7 +18,7 @@ export async function hentNaisApper(): Promise<NaisApp[]> {
         options.projectId = process.env.GOOGLE_CLOUD_PROJECT
     }
     const bigquery = new BigQuery(options)
-    const bqTabell = '`aura-prod-d7e3.dataproduct_apps.dataproduct_apps_unique_v3`'
+    const bqTabell = '`nais-prod-b6f2.dataproduct_apps.unique`'
     const query = `SELECT name,
                           cluster,
                           namespace,
