@@ -28,7 +28,7 @@ npm run tsc              # TypeScript type check
 
 ### Data Flow
 
-1. **Data Source**: BigQuery table `aura-prod-d7e3.dataproduct_apps.dataproduct_apps_unique_v3` contains NAIS app metadata
+1. **Data Source**: BigQuery table `nais-prod-b6f2.dataproduct_apps.unique` contains NAIS app metadata
 2. **Data Fetching**: `src/bigquery/naisAppsFetching.ts` queries BigQuery or loads from testdata
 3. **Node Calculation**: `src/nodes/kalkulerNoder.ts` transforms NaisApp data into graph nodes
 4. **Edge Calculation**: `src/nodes/kalkulerNoderOgKanter.ts` creates edges between nodes based on relationships
