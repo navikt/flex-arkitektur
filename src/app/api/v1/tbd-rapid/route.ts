@@ -10,7 +10,7 @@ let lastConsumersFetchTime = 0
 
 // Prometheus query URL
 const PROMETHEUS_URL =
-    'https://prometheus.prod.nav.cloud.nais.io/api/v1/query?query=count+by+%28app%2C+namespace%2C+event_name%2C+river%2C+behov%2C+losninger%2C+participating_services%29+%28%0A++increase%28message_counter_total%7Brapid%3D%22tbd.rapid.v1%22%2C+validated%3D%22ok%22%2C+event_name%3D%7E%22.%2B%22%7D%5B48h%5D%29+%3E+0%0A%29'
+    'https://prometheus.nav.cloud.nais.io/prometheus/api/v1/query?query=count+by+%28app%2C+namespace%2C+event_name%2C+river%2C+behov%2C+losninger%2C+participating_services%29+%28%0A++increase%28message_counter_total%7Brapid%3D%22tbd.rapid.v1%22%2C+validated%3D%22ok%22%2C+event_name%3D%7E%22.%2B%22%2C+k8s_cluster_name%3D%22prod%22%7D%5B48h%5D%29+%3E+0%0A%29'
 
 async function fetchConsumersFromPrometheus(): Promise<PrometheusResponse> {
     try {
