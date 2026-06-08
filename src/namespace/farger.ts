@@ -1,11 +1,11 @@
 const farger = [
-    'bg-blue-500',
-    'bg-orange-500',
-    'bg-lightblue-500',
-    'bg-green-500',
-    'bg-red-500',
-    'bg-deepblue-500',
-    'bg-purple-500',
+    'bg-ax-accent-600',
+    'bg-ax-warning-600',
+    'bg-ax-brand-blue-300',
+    'bg-ax-success-600',
+    'bg-ax-danger-600',
+    'bg-ax-brand-blue-600',
+    'bg-ax-meta-purple-600',
 ]
 
 export function namespaceToAkselColor(namespace: string): string {

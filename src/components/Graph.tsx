@@ -219,7 +219,7 @@ export function Graph({
                             return (
                                 <Chips.Toggle
                                     key={namespace}
-                                    className={namespaceToAkselColor(namespace) + ' text-white'}
+                                    className={namespaceToAkselColor(namespace) + ' white'}
                                     checkmark={false}
                                 >
                                     {namespace}
