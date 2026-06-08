@@ -118,9 +118,9 @@ export const PoHelse = (): ReactElement => {
 
 function CelleForInnhold({ integrasjoner }: { integrasjoner: string[] }): ReactElement {
     function TagForUrl({ u }: { u: string }): ReactElement {
-        const q2Tag = <div className="bg-blue-100 max-h-6 mr-2 px-2 border">q2</div>
+        const q2Tag = <div className="bg-ax-accent-200 max-h-6 mr-2 px-2 border">q2</div>
 
-        const q1Tag = <div className="bg-green-100 max-h-6 mr-2 px-2 border">q1</div>
+        const q1Tag = <div className="bg-ax-success-200 max-h-6 mr-2 px-2 border">q1</div>
         if (u.includes('q1')) {
             return q1Tag
         }

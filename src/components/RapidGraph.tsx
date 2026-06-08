@@ -160,7 +160,7 @@ export function RapidGraph({
             <div ref={container} style={{ height: height() }} />
             {popoverData && (
                 <div
-                    className="fixed z-[10000] bg-white border border-gray-300 rounded-lg shadow-lg p-3 pointer-events-none max-w-md"
+                    className="fixed z-10000 white border border-ax-neutral-400 rounded-lg shadow-lg p-3 pointer-events-none max-w-md"
                     style={{
                         left: popoverData.x + 15,
                         top: popoverData.y + 15,
@@ -168,14 +168,14 @@ export function RapidGraph({
                 >
                     <div className="text-sm">
                         <div className="mb-1">
-                            <span className="text-gray-500 font-semibold">Fra: </span>
+                            <span className="text-ax-neutral-600 font-semibold">Fra: </span>
                             <span className="font-mono">{popoverData.fromName}</span>
                         </div>
                         <div className="mb-2">
-                            <span className="text-gray-500 font-semibold">Til: </span>
+                            <span className="text-ax-neutral-600 font-semibold">Til: </span>
                             <span className="font-mono">{popoverData.toName}</span>
                         </div>
-                        <div className="text-gray-500 font-semibold mb-1">Events:</div>
+                        <div className="text-ax-neutral-600 font-semibold mb-1">Events:</div>
                         <ul className="list-none space-y-0.5 pl-0">
                             {popoverData.events.map((event) => (
                                 <li key={event} className="text-xs font-mono">
@@ -193,7 +193,7 @@ export function RapidGraph({
                             return (
                                 <Chips.Toggle
                                     key={namespace}
-                                    className={namespaceToAkselColor(namespace) + ' text-white'}
+                                    className={namespaceToAkselColor(namespace) + ' white'}
                                     checkmark={false}
                                 >
                                     {namespace}
