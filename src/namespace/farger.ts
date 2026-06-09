@@ -1,7 +1,7 @@
 const farger = [
     'bg-ax-accent-600',
     'bg-ax-warning-600',
-    'bg-ax-brand-blue-300',
+    'bg-ax-brand-blue-900',
     'bg-ax-success-600',
     'bg-ax-danger-600',
     'bg-ax-brand-blue-600',
