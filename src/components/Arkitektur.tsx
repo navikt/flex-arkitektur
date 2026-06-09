@@ -134,7 +134,8 @@ export const Arkitektur = (): ReactElement => {
         <>
             {fullscreen && (
                 <Button
-                    variant="secondary-neutral"
+                    data-color="neutral"
+                    variant="secondary"
                     className="mr-2 fixed top-10 right-10 z-50"
                     onClick={() => setFullscreen(false)}
                     icon={<ShrinkIcon title="Fullscreen" />}
@@ -236,13 +237,15 @@ export const Arkitektur = (): ReactElement => {
 
                         <div className="self-end">
                             <Button
-                                variant="secondary-neutral"
+                                data-color="neutral"
+                                variant="secondary"
                                 className="mr-2"
                                 onClick={() => setFullscreen(true)}
                                 icon={<ExpandIcon title="Fullscreen" />}
                             />
                             <Button
-                                variant="secondary-neutral"
+                                data-color="neutral"
+                                variant="secondary"
                                 onClick={() => setSideMenyOpen(!sideMenyOpen)}
                                 icon={<CogIcon title="Innstillinger" />}
                             />
@@ -319,7 +322,7 @@ export const Arkitektur = (): ReactElement => {
                 setVisEmoji={setVisEmoji}
             ></SideMeny>
             {slettNoder && (
-                <div className="fixed bottom-10 left-0 m-10 bg-gray-100 p-5 rounded">
+                <div className="fixed bottom-10 left-0 m-10 bg-ax-neutral-200 p-5 rounded-sm">
                     <Alert variant="info">Klikk på noder og kanter du vil fjerne fra visualiseringen.</Alert>
                     <Button
                         className="mt-2"

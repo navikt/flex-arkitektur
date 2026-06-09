@@ -53,7 +53,8 @@ export function SideMeny({
                 <div className="gap-y-8">
                     <div>
                         <Button
-                            variant="secondary-neutral"
+                            data-color="neutral"
+                            variant="secondary"
                             onClick={() => {
                                 setFilter([])
                                 setFilterTekst('')
@@ -111,7 +112,8 @@ export function SideMeny({
                         Automatisk organisering av noder
                     </Switch>
                     <Button
-                        variant="danger"
+                        data-color="danger"
+                        variant="primary"
                         onClick={() => {
                             setSlettNoder(true)
                             setOpenState(false)
