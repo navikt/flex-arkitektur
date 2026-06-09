@@ -105,8 +105,7 @@ export const TbdRapid = (): ReactElement => {
         <>
             {fullscreen && (
                 <Button
-                    data-color="neutral"
-                    variant="secondary"
+                    variant="secondary-neutral"
                     className="mr-2 fixed top-10 right-10 z-50"
                     onClick={() => setFullscreen(false)}
                     icon={<ShrinkIcon title="Fullscreen" />}
@@ -175,8 +174,7 @@ export const TbdRapid = (): ReactElement => {
                                 </Switch>
                             )}
                             <Button
-                                data-color="neutral"
-                                variant="secondary"
+                                variant="secondary-neutral"
                                 className="mr-2"
                                 onClick={() => setFullscreen(true)}
                                 icon={<ExpandIcon title="Fullscreen" />}
