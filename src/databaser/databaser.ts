@@ -45,11 +45,6 @@ const flexDatabaser = [
         databases: ['syfosoknadbrukernotifikasjon-db'],
     },
     {
-        appName: 'sykepengesoknad-altinn',
-        namespace: 'flex',
-        databases: ['sykepengesoknad-altinn-db'],
-    },
-    {
         appName: 'sykepengesoknad-arkivering-oppgave',
         namespace: 'flex',
         databases: ['sykepengesoknad-arkivering-oppgave-db'],
@@ -58,11 +53,6 @@ const flexDatabaser = [
         appName: 'sykepengesoknad-backend',
         namespace: 'flex',
         databases: ['sykepengesoknad'],
-    },
-    {
-        appName: 'sykepengesoknad-ikke-sendt-altinnvarsel',
-        namespace: 'flex',
-        databases: ['sykepengesoknad-ikke-sendt-altinnvarsel-db'],
     },
     {
         appName: 'sykepengesoknad-narmesteleder-varsler',
