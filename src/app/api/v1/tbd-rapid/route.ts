@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 
 import { isLocalOrDemo } from '@/utlis/env'
 import { PrometheusResponse } from '@/types'
+import { verifyUserLoggedIn } from '@/auth/authentication'
 
 // Cache for consumers data
 let cachedPrometheusResponse: PrometheusResponse | undefined = undefined
@@ -49,6 +50,7 @@ async function getPrometheusData(): Promise<PrometheusResponse> {
 }
 
 export async function GET(): Promise<NextResponse<PrometheusResponse | { error: string }>> {
+    await verifyUserLoggedIn()
     try {
         const data = await getPrometheusData()
 
