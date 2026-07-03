@@ -152,7 +152,7 @@ export function RapidGraph({
         if (fullscreen) {
             return '100vh'
         }
-        return 'calc(100vh - 28vh)'
+        return 'calc(100vh - 15vh)'
     }
 
     return (
