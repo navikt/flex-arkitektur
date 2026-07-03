@@ -113,7 +113,7 @@ export const TbdRapid = (): ReactElement => {
                 />
             )}
             {!fullscreen && (
-                <div className="h-46 px-10 py-5 pb-0">
+                <div className="px-10 py-5 pb-2 bg-ax-neutral-100">
                     <div className="flex gap-3">
                         <RadioGroup
                             legend="Søkemetode"
@@ -184,7 +184,7 @@ export const TbdRapid = (): ReactElement => {
                         </div>
                     </div>
                     {sokemetode === 'app' && valgteApper.length > 0 && (
-                        <div className="mt-2">
+                        <div className="-mt-8 translate-y-12 z-10 relative">
                             <Chips>
                                 {valgteApper.map((app) => {
                                     const splitt = app.split('.')
@@ -196,7 +196,7 @@ export const TbdRapid = (): ReactElement => {
                                             onDelete={() => {
                                                 setApper(valgteApper.filter((o) => o !== app))
                                             }}
-                                            className={namespaceToAkselColor(namespace)}
+                                            className={"ring-2 ring-gray-100 " + namespaceToAkselColor(namespace)}
                                         >
                                             {app}
                                         </Chips.Removable>
