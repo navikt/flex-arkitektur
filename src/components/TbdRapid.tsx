@@ -196,7 +196,7 @@ export const TbdRapid = (): ReactElement => {
                                             onDelete={() => {
                                                 setApper(valgteApper.filter((o) => o !== app))
                                             }}
-                                            className={"ring-2 ring-gray-100 " + namespaceToAkselColor(namespace)}
+                                            className={'ring-2 ring-gray-100 ' + namespaceToAkselColor(namespace)}
                                         >
                                             {app}
                                         </Chips.Removable>

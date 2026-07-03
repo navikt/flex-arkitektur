@@ -275,7 +275,7 @@ export const Arkitektur = (): ReactElement => {
                                             onDelete={() => {
                                                 setApper(valgteApper.filter((o) => o !== app))
                                             }}
-                                            className={"ring-2 ring-gray-100 " + skapClassName()}
+                                            className={'ring-2 ring-gray-100 ' + skapClassName()}
                                         >
                                             {app}
                                         </Chips.Removable>
