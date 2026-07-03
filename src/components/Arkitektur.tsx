@@ -142,7 +142,7 @@ export const Arkitektur = (): ReactElement => {
                 />
             )}
             {!fullscreen && (
-                <div className="h-46 px-10 py-5">
+                <div className="h-46 px-10 py-5 pb-0">
                     <div className="flex gap-3">
                         <RadioGroup
                             legend="Søkemetode"
