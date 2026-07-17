@@ -25,7 +25,7 @@ export function RapidGraph({
     const container = useRef<HTMLDivElement>(null)
     const forrigeNoder = useRef(new Set<string>())
     const forrigeEdges = useRef(new Set<string>())
-    const networkRef = useRef<Network>()
+    const networkRef = useRef<Network | null>(null)
     const nettverkErRendret = useRef(false)
     const mousePosRef = useRef({ x: 0, y: 0 })
 
