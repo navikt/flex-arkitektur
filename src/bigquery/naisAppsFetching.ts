@@ -40,7 +40,6 @@ export async function hentNaisApper(): Promise<NaisApp[]> {
     return mapResponse(rows)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapResponse(rows: any[]): NaisApp[] {
     return rows.map((row) => {
         const newVar: NaisApp = {

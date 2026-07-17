@@ -24,7 +24,6 @@ export const Arkitektur = (): ReactElement => {
     const [slettNoder, setSlettNoder] = useState(false)
     const [filter, setFilter] = useQueryState('filter', parseAsArrayOf(parseAsString).withDefault([]))
     const [filterTekst, setFilterTekst] = useState(filter.join(' '))
-    const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
     const [slettedeNoder] = useQueryState('slettedeNoder', parseAsArrayOf(parseAsString).withDefault([]))
     const [appFilter, setAppFilter] = useState('')
     const initielleSlettedeNoder = useRef(slettedeNoder)
@@ -51,15 +50,12 @@ export const Arkitektur = (): ReactElement => {
     })
     useEffect(() => {
         // Avbryt eksisterende timeout
-        if (timeoutId) clearTimeout(timeoutId)
         if (!hasTyped) return
 
         // Opprett en ny timeout
         const newTimeoutId = setTimeout(() => {
             setFilter(filterTekst.split(' '))
         }, 500)
-
-        setTimeoutId(newTimeoutId)
 
         // Rengjøringsfunksjon
         return () => clearTimeout(newTimeoutId)
