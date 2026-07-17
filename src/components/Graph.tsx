@@ -40,7 +40,7 @@ export function Graph({
     const forrigeNoder = useRef(new Set<string>())
     const forrigeEdges = useRef(new Set<string>())
     const forrigeEmoji = useRef(emoji)
-    const networkRef = useRef<Network>()
+    const networkRef = useRef<Network | null>(null)
     const [visSynkroneAppKall] = useQueryState('synkroneKall', parseAsBoolean.withDefault(true))
     const [visEksterneKall] = useQueryState('eksterneKall', parseAsBoolean.withDefault(true))
     const [visDatabase] = useQueryState('database', parseAsBoolean.withDefault(true))
