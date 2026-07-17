@@ -175,7 +175,7 @@ export function Graph({
                             networkRef.current?.selectNodes(params.nodes)
                             networkRef.current?.deleteSelected()
                             networkRef.current?.selectNodes([])
-                        } catch (e) {
+                        } catch {
                             //TODO noe skjer, men det funker logger.error(e)
                         }
                     }
@@ -184,7 +184,7 @@ export function Graph({
                             networkRef.current?.selectEdges(params.edges)
                             networkRef.current?.deleteSelected()
                             networkRef.current?.selectEdges([])
-                        } catch (e) {
+                        } catch {
                             //TODO noe skjer, men det funker logger.error(e)
                         }
                     }
