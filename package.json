@@ -42,7 +42,7 @@
         "vis-network": "^10.1.0"
     },
     "devDependencies": {
-        "@eslint/eslintrc": "^3.3.1",
+        "@eslint/eslintrc": "^3.3.6",
         "@navikt/tsm-prettier": "^2.0.1",
         "eslint": "^9.39.4",
         "eslint-config-next": "^16.2.10",
