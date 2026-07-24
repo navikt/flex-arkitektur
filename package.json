@@ -26,7 +26,7 @@
         "@navikt/ds-tokens": "^8.11.1",
         "@navikt/next-logger": "^5.0.0",
         "@navikt/oasis": "^4.1.4",
-        "@tailwindcss/postcss": "^4.3.2",
+        "@tailwindcss/postcss": "^4.3.3",
         "@tanstack/react-query": "^5.101.2",
         "@types/node": "20.14.10",
         "@types/react": "^19.2.17",
