@@ -39,7 +39,7 @@
         "tailwindcss": "4.3.3",
         "typescript": "^6.0.3",
         "uuid": "^14.0.1",
-        "vis-network": "^10.1.1"
+        "vis-network": "^10.1.2"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.6",
